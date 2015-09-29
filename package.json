@@ -1,12 +1,12 @@
 {
   "name": "q-postgres",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Postgres with promises.",
   "main": "q-postgres.js",
 
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/luiz-simples/q-postgres.git"
+    "url": "git://github.com/luiz-simples/q-postgres.git"
   },
 
   "bugs": {
