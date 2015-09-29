@@ -1,0 +1,10 @@
+{
+  "name": "pg-promises",
+  "version": "1.0.0",
+  "description": "",
+  "main": "pg-promise.js",
+  "scripts": {},
+  "author": "",
+  "license": "ISC"
+}
+
