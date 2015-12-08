@@ -1,30 +1,25 @@
 {
   "name": "q-postgres",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Postgres with promises.",
   "main": "q-postgres.js",
-
   "repository": {
     "type": "git",
     "url": "git://github.com/luiz-simples/q-postgres.git"
   },
-
   "bugs": {
     "url": "https://github.com/luiz-simples/q-postgres/issues"
   },
-
   "homepage": "https://github.com/luiz-simples/q-postgres#readme",
   "scripts": {},
   "author": "Luiz Amorim <luiz.simples@gmail.com> (http://nurimba.com.br)",
   "license": "The Unilicense",
-
   "dependencies": {
     "q": "^1.4.1",
-    "pg": "^4.4.2"
+    "pg": "^4.4.3"
   },
-
   "engines": {
-    "node": "~4.1.1",
-    "npm": "~2.14.4"
+    "node": "~4.2.2",
+    "npm": "~2.14.7"
   }
 }
