@@ -1,20 +1,23 @@
 'use strict';
 
-var Promise   = require('q').Promise;
+var q = require('q');
 var Postgres  = require('pg');
 var PgWrapper = require('./pg.wrapper');
 
-function PgPromise(user, pass, host, base) {
+function PgPromise(user, pass, host, base, url) {
   var pgPromise = this;
-  user = String(user);
-  pass = String(pass);
-  host = String(host);
-  base = base && String(base).length ? '/'.concat(base) : '';
+  var connString = url;
 
-  var connString = 'pg://'.concat(user, ':', pass, '@', host, base);
+  if (!url) {
+    user = String(user);
+    pass = String(pass);
+    host = String(host);
+    base = base && String(base).length ? '/'.concat(base) : '';
+    connString = 'pg://'.concat(user, ':', pass, '@', host, base);
+  }
 
   pgPromise.connect = function() {
-    return Promise(function(resolve, reject) {
+    return q.Promise(function(resolve, reject) {
       Postgres.connect(connString, function(err, client, done) {
         if (err) {
           reject(err);
