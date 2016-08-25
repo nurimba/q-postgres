@@ -1,31 +1,42 @@
 {
-  "extends": "eslint:recommended",
-
-  "plugins": [
-    "react"
-  ],
-
-  "ecmaFeatures": {
-    "jsx": true
+  env: { es6: true },
+  parser: "babel-eslint",
+  plugins: ["react"],
+  extends: [ "standard", "standard-react" ],
+  globals: {
+    $: false,
+    jest: false,
+    describe: false,
+    pit: false,
+    it: false,
+    expect: false,
+    before: false,
+    after: false,
+    beforeEach: false,
+    afterEach: false,
+    beforeAll: false,
+    afterAll: false,
+    jasmine: false,
+    document: false
   },
-
-  "env": {
-    "node": true,
-    "browser": false
-  },
-
-  "rules": {
-    "strict": [2, "global"],
-    "camelcase": 2,
-    "curly": 0,
-    "brace-style": [2, "1tbs"],
+  rules: {
+    "no-throw-literal": 1,
+    "strict": [2, "never"],
+    "semi": [2, "never"],
     "quotes": [2, "single"],
-    "semi": [2, "always"],
-    "space-in-brackets": [0, "never"],
-    "space-infix-ops": 2,
-    "no-undef": 2,
-    "no-unused-vars": 2,
-    "react/react-in-jsx-scope": 2,
-    "react/jsx-uses-react": 2
+    "no-var": 1,
+    "eol-last": 1,
+    "no-undef": "error",
+    "no-new-require": 1,
+    "no-sync": 1,
+    "no-mixed-requires": [1, false],
+    "react/wrap-multilines": 2,
+    "no-unsafe-finally": 0,
+    "no-useless-computed-key": 0,
+    "react/jsx-uses-react": 1,
+    "react/jsx-no-undef": 2,
+    "react/jsx-sort-props": 0,
+    "react/jsx-sort-prop-types": 0,
+    "react/jsx-no-bind": 0
   }
 }

@@ -1,25 +1,43 @@
 {
   "name": "q-postgres",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Postgres with promises.",
-  "main": "q-postgres.js",
+  "main": "dist/q-postgres.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/luiz-simples/q-postgres.git"
+    "url": "git://github.com/nurimba/q-postgres.git"
   },
   "bugs": {
-    "url": "https://github.com/luiz-simples/q-postgres/issues"
+    "url": "https://github.com/nurimba/q-postgres/issues"
   },
-  "homepage": "https://github.com/luiz-simples/q-postgres#readme",
-  "scripts": {},
+  "homepage": "https://github.com/nurimba/q-postgres#readme",
+  "scripts": {
+    "build": "babel src/ -d dist"
+  },
   "author": "Luiz Amorim <luiz.simples@gmail.com> (http://nurimba.com.br)",
   "license": "The Unilicense",
   "dependencies": {
-    "q": "^1.4.1",
-    "pg": "^4.4.3"
+    "pg": "^6.1.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.14.0",
+    "babel-core": "^6.13.2",
+    "babel-eslint": "^6.1.2",
+    "babel-polyfill": "^6.13.0",
+    "babel-preset-es2015": "^6.13.2",
+    "babel-preset-stage-0": "^6.5.0",
+    "babel-register": "^6.11.6",
+    "eslint": "^3.3.1",
+    "eslint-config-rackt": "^1.1.1",
+    "eslint-config-standard": "^5.3.5",
+    "eslint-config-standard-jsx": "^2.0.0",
+    "eslint-config-standard-react": "^3.0.0",
+    "eslint-plugin-promise": "^2.0.1",
+    "eslint-plugin-react": "^6.1.1",
+    "eslint-plugin-standard": "^2.0.0"
   },
   "engines": {
-    "node": "~4.3.1",
-    "npm": "~3.7.3"
+    "node": "~6.3.1",
+    "npm": "~3.10.3"
   }
 }
