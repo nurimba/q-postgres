@@ -23,11 +23,11 @@ const config = {
 //and set a limit of maximum 10 idle clients
 const pool = qPostgres(config)
 
-// to run a query we can acquire a client from the pool,
-// run a query on the client, and then return the client to the pool
-const client = pool.connect()
-
 try {
+  // to run a query we can acquire a client from the pool,
+  // run a query on the client, and then return the client to the pool
+  const client = await pool.connect()
+
   // Start transaction
   await client.startTransaction()
 
@@ -80,40 +80,40 @@ var pool = qPostgres(config);
 
 // to run a query we can acquire a client from the pool,
 // run a query on the client, and then return the client to the pool
-var client = pool.connect();
+pool.connect().then(function(var client) {
+  // Start transaction
+  var operation = client.startTransaction();
 
-// Start transaction
-var operation = client.startTransaction();
+  // Execute commands sql
+  operation = operation.then(function() {
+    var sqlSelect = 'SELECT * FROM customers';
+    var sqlInsert = 'INSERT INTO customers (name, birthday) VALUES ("Test", "1988-06-10")';
+    var sqlUpdate = 'UPDATE customers SET name = "Test", birthday = "1988-06-10" WHERE (id = 1)';
+    var sqlDelete = 'DELETE FROM customers WHERE (id = 1)';
 
-// Execute commands sql
-operation = operation.then(function() {
-  var sqlSelect = 'SELECT * FROM customers';
-  var sqlInsert = 'INSERT INTO customers (name, birthday) VALUES ("Test", "1988-06-10")';
-  var sqlUpdate = 'UPDATE customers SET name = "Test", birthday = "1988-06-10" WHERE (id = 1)';
-  var sqlDelete = 'DELETE FROM customers WHERE (id = 1)';
+    return Promise.all([
+      client.execute(sqlSelect),
+      client.execute(sqlInsert),
+      client.execute(sqlUpdate),
+      client.execute(sqlDelete)
+    ]);
+  });
 
-  return Promise.all([
-    client.execute(sqlSelect),
-    client.execute(sqlInsert),
-    client.execute(sqlUpdate),
-    client.execute(sqlDelete)
-  ]);
-});
+  // Commit transaction
+  operation = operation.then(function(results) {
+    console.log(results);
+    return client.commit();
+  });
 
-// Commit transaction
-operation = operation.then(function(results) {
-  console.log(results);
-  return client.commit();
-});
+  // Rollback transaction
+  operation = operation.catch(function(error) {
+    console.log(error);
+    return client.rollback();
+  });
 
-// Rollback transaction
-operation = operation.catch(function(error) {
-  console.log(error);
-  return client.rollback();
-});
-
-// release the client back to the pool
-operation.then(function() {
-  return client.release();
+  // release the client back to the pool
+  operation.then(function() {
+    return client.release();
+  });
 });
 ```
