@@ -1,7 +1,7 @@
 # q-postgres
 Postgres with promises.
 
-### Sample ES6
+##How to usage?
 ```javascript
 import qPostgres from 'q-postgres'
 
@@ -56,64 +56,28 @@ try {
 }
 ```
 
-### Sample ES5
-```javascript
-var qPostgres = rquire('q-postgres');
+##How to contribute?
 
-// create a config to configure both pooling behavior
-// and client options
-// note: all config is optional and the environment variables
-// will be read if the config is not present
-var config = {
-  user: 'foo', //env var: PGUSER
-  database: 'my_db', //env var: PGDATABASE
-  password: 'secret', //env var: PGPASSWORD
-  port: 5432, //env var: PGPORT
-  max: 10, // max number of clients in the pool
-  idleTimeoutMillis: 30000 // how long a client is allowed to remain idle before being closed
-};
+Environment with:
 
-//this initializes a connection pool
-//it will keep idle connections open for a 30 seconds
-//and set a limit of maximum 10 idle clients
-var pool = qPostgres(config);
+* [Docker](https://www.docker.com/products/docker#/linux)
+* [Docker Compose](https://docs.docker.com/compose/install/)
+* [Debian](https://www.debian.org/releases/stable/)
+* [Make](http://www.gnu.org/software/make/manual/make.html#Running)
+* [NodeJS](https://nodejs.org/dist/latest-v4.x/docs/api/)
+* [NPM](https://www.npmjs.com/package/q-postgres)
 
-// to run a query we can acquire a client from the pool,
-// run a query on the client, and then return the client to the pool
-pool.connect().then(function(var client) {
-  // Start transaction
-  var operation = client.startTransaction();
 
-  // Execute commands sql
-  operation = operation.then(function() {
-    var sqlSelect = 'SELECT * FROM customers';
-    var sqlInsert = 'INSERT INTO customers (name, birthday) VALUES ("Test", "1988-06-10")';
-    var sqlUpdate = 'UPDATE customers SET name = "Test", birthday = "1988-06-10" WHERE (id = 1)';
-    var sqlDelete = 'DELETE FROM customers WHERE (id = 1)';
+Make tasks of environment
 
-    return Promise.all([
-      client.execute(sqlSelect),
-      client.execute(sqlInsert),
-      client.execute(sqlUpdate),
-      client.execute(sqlDelete)
-    ]);
-  });
+* Build docker environment - ```$ make build```
+* UP and RUN docker environment - ```$ make run```
+* Stop docker environment - ```$ make stop```
+* Destroy docker environment - ```$ make down```
 
-  // Commit transaction
-  operation = operation.then(function(results) {
-    console.log(results);
-    return client.commit();
-  });
 
-  // Rollback transaction
-  operation = operation.catch(function(error) {
-    console.log(error);
-    return client.rollback();
-  });
-
-  // release the client back to the pool
-  operation.then(function() {
-    return client.release();
-  });
-});
+First steps after environment builded
+```sh
+pg:~/app(master)$ npm install
+pg:~/app(master)$ npm test
 ```

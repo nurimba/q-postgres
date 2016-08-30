@@ -4,13 +4,11 @@ const BEGIN = 'BEGIN'
 const COMMIT = 'COMMIT'
 const ROLLBACK = 'ROLLBACK'
 
-const getConnection = (pool) => {
-  return new Promise((resolve, reject) => {
-    pool.connect((err, client, release) => {
-      if (err) return reject(err)
-      resolve({client, release})
-    })
-  })
+const getConnection = async (pool) => {
+  const client = await pool.connect()
+  const {errno} = client
+  if (errno) throw new Error(client.message)
+  return client
 }
 
 const runSql = (client, sql) => {
@@ -23,13 +21,14 @@ const runSql = (client, sql) => {
 }
 
 const factoryConnection = async (pool) => {
-  const {client, release} = await getConnection(pool)
+  const client = await getConnection(pool)
+
   return {
-    release,
-    execute: runSql.bind(client),
-    commit: runSql.bind(client, COMMIT),
-    rollback: runSql.bind(client, ROLLBACK),
-    startTransaction: runSql.bind(client, BEGIN)
+    release: async () => client.release(),
+    execute: runSql.bind(this, client),
+    commit: runSql.bind(this, client, COMMIT),
+    rollback: runSql.bind(this, client, ROLLBACK),
+    startTransaction: runSql.bind(this, client, BEGIN)
   }
 }
 
