@@ -1,4 +1,5 @@
 import {Pool} from 'pg'
+import qOrm from './orm'
 
 const BEGIN = 'BEGIN'
 const COMMIT = 'COMMIT'
@@ -31,6 +32,8 @@ const factoryConnection = async (pool) => {
     startTransaction: runSql.bind(this, client, BEGIN)
   }
 }
+
+export const orm = qOrm
 
 export default (config) => {
   const pool = new Pool(config)

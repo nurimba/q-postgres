@@ -4,9 +4,5 @@
     "stage-0"
   ],
 
-  "env": {
-    "production": {
-      "presets": ["babili"]
-    }
-  }
+  "plugins": ["transform-runtime"]
 }
