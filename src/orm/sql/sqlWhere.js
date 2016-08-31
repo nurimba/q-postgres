@@ -15,7 +15,7 @@ const whereMap = ({where, select, table}) => {
 
     let tableName = condition.table || table
     const isString = fieldIsString(select, field)
-    const val = isString ? `'${String(value).replace('\'', '\\\'')}'` : value
+    const val = isString ? `'${String(value).replace('\'', '\\\'').replace('"', '\\"')}'` : value
     return `${tableName}.${field} ${comparator} ${val}`
   })
 }

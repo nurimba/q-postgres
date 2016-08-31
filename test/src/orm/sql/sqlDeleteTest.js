@@ -6,17 +6,18 @@ describe('orm', () => {
 
     beforeEach(function () {
       expect = this.expect
-      const {customerStructure} = this
-      schema = {...customerStructure, where: [
-        {field: 'id', comparator: '=', value: 'a1b2c3d4'}
-      ]}
+      const {customerSchema} = this
+      schema = {
+        ...customerSchema,
+        where: [{field: 'id', comparator: '=', value: 10001}]
+      }
     })
 
     it('mount delete query of schema.', function () {
       const sql = sqlDelete(schema)
       const expectedQuery = `
 DELETE FROM customers
-WHERE (customers.id = 'a1b2c3d4');
+WHERE (customers.id = 10001);
 `.trim()
 
       expect(sql).to.equal(expectedQuery)

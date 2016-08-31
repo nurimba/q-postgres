@@ -4,9 +4,9 @@ describe('orm', () => {
 
     beforeEach(function () {
       expect = this.expect
-      const {connection, customerSchema, childrenSchema} = this
-      customerModel = customerSchema(connection)
-      childrenModel = childrenSchema(connection)
+      const {connection, customerORM, childrenORM} = this
+      customerModel = customerORM(connection)
+      childrenModel = childrenORM(connection)
     })
 
     it('find by query table.', async () => {

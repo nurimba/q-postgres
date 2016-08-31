@@ -1,3 +1,10 @@
+import types from '../types'
+
+const {
+  DATE,
+  BOOLEAN
+} = types
+
 export default async ({fields}, {execute}, sql) => {
   const {rows} = await execute(sql)
 
@@ -5,19 +12,24 @@ export default async ({fields}, {execute}, sql) => {
     let newRow = {}
 
     Object.keys(fields).forEach((field) => {
-      let value = row[field]
-      const {type} = fields[field]
+      let value = row[field] || row[field.toLowerCase()]
+      newRow[field] = value
 
-      if (type === Date) {
+      let type
+      const typing = fields[field]
+      if (typeof typing === 'string') type = typing
+      if (typeof typing === 'object') type = typing.type
+      if (type === BOOLEAN) newRow[field] = Boolean(value)
+
+      if (value === null) return
+      if (value === undefined) return
+
+      if (type === DATE) {
         const dt = new Date(value)
-        const day = `0${dt.getDate()}`.substring(-2)
-        const mon = `0${dt.getMonth() + 1}`.substring(-2)
-        value = value ? `${dt.getFullYear()}-${mon}-${day}` : null
+        const day = `0${dt.getDate()}`.substr(-2)
+        const mon = `0${dt.getMonth() + 1}`.substr(-2)
+        newRow[field] = `${dt.getFullYear()}-${mon}-${day}`
       }
-
-      if (type === String) value = String(value || '')
-      if (type === Boolean) value = Boolean(value)
-      Object.assign(newRow, {[field]: value})
     })
 
     return newRow

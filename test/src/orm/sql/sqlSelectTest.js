@@ -1,4 +1,12 @@
 import sqlSelect from '../../../../src/orm/sql/sqlSelect'
+import {types} from '../../../../src'
+const {
+  DATE,
+  NAME,
+  BOOLEAN,
+  INTEGER,
+  PRIMARY
+} = types
 
 describe('orm', () => {
   describe('sqlSelect', () => {
@@ -6,14 +14,17 @@ describe('orm', () => {
 
     beforeEach(function () {
       expect = this.expect
-      const {customerStructure} = this
-      schema = {...customerStructure, select: [
-        {field: 'id', type: String},
-        {field: 'name', type: String},
-        {field: 'age', type: Number},
-        {field: 'birthday', type: Date},
-        {field: 'deleted', type: Boolean}
-      ]}
+      const {customerSchema} = this
+      schema = {
+        ...customerSchema,
+        select: [
+          {field: 'id', type: PRIMARY},
+          {field: 'name', type: NAME},
+          {field: 'age', type: INTEGER},
+          {field: 'birthday', type: DATE},
+          {field: 'deleted', type: BOOLEAN}
+        ]
+      }
     })
 
     it('mount select query of schema.', function () {
@@ -36,10 +47,10 @@ GROUP BY customers.id, customers.name, customers.age, customers.birthday, custom
 
     it('mount select query FUNCS with GROUP BY.', function () {
       schema.select = [
-        {field: 'id', type: String, func: 'MAX'},
-        {field: 'age', type: Number, func: 'AVG'},
-        {field: 'birthday', type: Date, func: 'MIN'},
-        {field: 'deleted', type: Boolean}
+        {field: 'id', type: PRIMARY, func: 'MAX'},
+        {field: 'age', type: INTEGER, func: 'AVG'},
+        {field: 'birthday', type: DATE, func: 'MIN'},
+        {field: 'deleted', type: BOOLEAN}
       ]
       const sql = sqlSelect(schema)
       const expectedQuery = `
@@ -158,8 +169,10 @@ ORDER BY 4 ASC, 5 DESC, 3 ASC, 2 DESC`.trim()
 
     it('mount select query with JOINS.', function () {
       schema.joins = [{
-        tableRef: 'child', fieldRef: 'parent',
-        tableLink: 'customers', fieldLink: 'id'
+        tableRef: 'child',
+        fieldRef: 'parent',
+        tableLink: 'customers',
+        fieldLink: 'id'
       }]
 
       const sql = sqlSelect(schema)
@@ -172,19 +185,21 @@ JOIN child ON (child.parent = customers.id)`.trim()
 
     it('mount select query with fields of JOINS.', function () {
       schema.joins = [{
-        tableRef: 'child', fieldRef: 'parent',
-        tableLink: 'customers', fieldLink: 'id'
+        tableRef: 'child',
+        fieldRef: 'parent',
+        tableLink: 'customers',
+        fieldLink: 'id'
       }]
 
       schema.select.push(
-        {table: 'customers', field: 'other1', type: String},
-        {table: 'customers', field: 'other2', type: String},
+        {table: 'customers', field: 'other1', type: NAME},
+        {table: 'customers', field: 'other2', type: NAME},
 
-        {table: 'child', field: 'id', type: String},
-        {table: 'child', field: 'name', type: String},
-        {table: 'child', field: 'age', type: Number},
-        {table: 'child', field: 'birthday', type: Date},
-        {table: 'child', field: 'deleted', type: Boolean}
+        {table: 'child', field: 'id', type: PRIMARY},
+        {table: 'child', field: 'name', type: NAME},
+        {table: 'child', field: 'age', type: INTEGER},
+        {table: 'child', field: 'birthday', type: DATE},
+        {table: 'child', field: 'deleted', type: BOOLEAN}
       )
 
       const sql = sqlSelect(schema)
@@ -197,19 +212,21 @@ JOIN child ON (child.parent = customers.id)`.trim()
 
     it('mount select full query with fields of JOINS.', function () {
       schema.joins = [{
-        tableRef: 'child', fieldRef: 'parent',
-        tableLink: 'customers', fieldLink: 'id'
+        tableRef: 'child',
+        fieldRef: 'parent',
+        tableLink: 'customers',
+        fieldLink: 'id'
       }]
 
       schema.select.push(
-        {table: 'customers', field: 'other1', type: String},
-        {table: 'customers', field: 'other2', type: String},
+        {table: 'customers', field: 'other1', type: NAME},
+        {table: 'customers', field: 'other2', type: NAME},
 
-        {table: 'child', field: 'id', type: String},
-        {table: 'child', field: 'name', type: String},
-        {table: 'child', field: 'age', type: Number},
-        {table: 'child', field: 'birthday', type: Date},
-        {table: 'child', field: 'deleted', type: Boolean}
+        {table: 'child', field: 'id', type: PRIMARY},
+        {table: 'child', field: 'name', type: NAME},
+        {table: 'child', field: 'age', type: INTEGER},
+        {table: 'child', field: 'birthday', type: DATE},
+        {table: 'child', field: 'deleted', type: BOOLEAN}
       )
 
       const sql = sqlSelect(schema)
@@ -222,11 +239,15 @@ JOIN child ON (child.parent = customers.id)`.trim()
 
     it('mount select query with conditions.', function () {
       schema.joins = [{
-        tableRef: 'childs', fieldRef: 'customer',
-        tableLink: 'customers', fieldLink: 'id'
+        tableRef: 'childs',
+        fieldRef: 'customer',
+        tableLink: 'customers',
+        fieldLink: 'id'
       }, {
-        tableRef: 'events', fieldRef: 'child',
-        tableLink: 'childs', fieldLink: 'id'
+        tableRef: 'events',
+        fieldRef: 'child',
+        tableLink: 'childs',
+        fieldLink: 'id'
       }]
 
       schema.where = [
@@ -268,33 +289,37 @@ WHERE (childs.age = 18)
         table: 'customers',
 
         select: [
-          {field: 'id', type: String},
-          {field: 'name', type: String},
-          {field: 'age', type: Number, func: 'MAX'},
-          {field: 'birthday', type: Date, func: 'MIN'},
-          {field: 'deleted', type: Boolean},
-          {table: 'customers', field: 'other1', type: String},
-          {table: 'customers', field: 'other2', type: String},
+          {field: 'id', type: PRIMARY},
+          {field: 'name', type: NAME},
+          {field: 'age', type: INTEGER, func: 'MAX'},
+          {field: 'birthday', type: DATE, func: 'MIN'},
+          {field: 'deleted', type: BOOLEAN},
+          {table: 'customers', field: 'other1', type: NAME},
+          {table: 'customers', field: 'other2', type: NAME},
 
-          {table: 'childs', field: 'id', type: String},
-          {table: 'childs', field: 'name', type: String},
-          {table: 'childs', field: 'age', type: Number, func: 'MAX'},
-          {table: 'childs', field: 'birthday', type: Date, func: 'MIN'},
-          {table: 'childs', field: 'deleted', type: Boolean},
+          {table: 'childs', field: 'id', type: PRIMARY},
+          {table: 'childs', field: 'name', type: NAME},
+          {table: 'childs', field: 'age', type: INTEGER, func: 'MAX'},
+          {table: 'childs', field: 'birthday', type: DATE, func: 'MIN'},
+          {table: 'childs', field: 'deleted', type: BOOLEAN},
 
-          {table: 'events', field: 'id', type: String},
-          {table: 'events', field: 'name', type: String},
-          {table: 'events', field: 'age', type: Number, func: 'AVG'},
-          {table: 'events', field: 'birthday', type: Date, func: 'AVG'},
-          {table: 'events', field: 'deleted', type: Boolean}
+          {table: 'events', field: 'id', type: PRIMARY},
+          {table: 'events', field: 'name', type: NAME},
+          {table: 'events', field: 'age', type: INTEGER, func: 'AVG'},
+          {table: 'events', field: 'birthday', type: DATE, func: 'AVG'},
+          {table: 'events', field: 'deleted', type: BOOLEAN}
         ],
 
         joins: [{
-          tableRef: 'childs', fieldRef: 'customer',
-          tableLink: 'customers', fieldLink: 'id'
+          tableRef: 'childs',
+          fieldRef: 'customer',
+          tableLink: 'customers',
+          fieldLink: 'id'
         }, {
-          tableRef: 'events', fieldRef: 'child',
-          tableLink: 'childs', fieldLink: 'id'
+          tableRef: 'events',
+          fieldRef: 'child',
+          tableLink: 'childs',
+          fieldLink: 'id'
         }],
 
         where: [

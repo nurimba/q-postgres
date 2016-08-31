@@ -6,17 +6,20 @@ describe('orm', () => {
 
     beforeEach(function () {
       expect = this.expect
-      const {customerStructure} = this
-      schema = {...customerStructure, data: {
-        name: 'Teste',
-        age: 18,
-        birthday: '1988-06-10',
-        deleted: false
-      },
+      const {customerSchema} = this
+      schema = {
+        ...customerSchema,
+        data: {
+          name: 'Teste',
+          age: 18,
+          birthday: '1988-06-10',
+          deleted: false
+        },
 
-      where: [
-        {field: 'id', comparator: '=', value: 'a1b2c3d4'}
-      ]}
+        where: [
+          {field: 'id', comparator: '=', value: 10003}
+        ]
+      }
     })
 
     it('mount update query of schema.', function () {
@@ -27,7 +30,7 @@ UPDATE customers
       age = 18,
       birthday = '1988-06-10',
       deleted = false
-  WHERE (customers.id = 'a1b2c3d4')
+  WHERE (customers.id = 10003)
   RETURNING id, name, age, birthday, deleted;
 `
       expect(sql).to.equal(expectedQuery.trim())
@@ -41,7 +44,7 @@ UPDATE customers
   SET name = 'Teste',
       birthday = '1988-06-10',
       deleted = false
-  WHERE (customers.id = 'a1b2c3d4')
+  WHERE (customers.id = 10003)
   RETURNING id, name, age, birthday, deleted;
   `
       expect(sql).to.equal(expectedQuery.trim())
@@ -56,7 +59,7 @@ UPDATE customers
   SET name = 'Teste',
       birthday = null,
       deleted = false
-  WHERE (customers.id = 'a1b2c3d4')
+  WHERE (customers.id = 10003)
   RETURNING id, name, age, birthday, deleted;
 `
       expect(sql).to.equal(expectedQuery.trim())

@@ -6,21 +6,24 @@ describe('orm', () => {
 
     beforeEach(function () {
       expect = this.expect
-      const {customerStructure} = this
-      schema = {...customerStructure, data: {
-        id: 'a1b2c3d4',
-        name: 'Teste',
-        age: 18,
-        birthday: '1988-06-10',
-        deleted: false
-      }}
+      const {customerSchema} = this
+      schema = {
+        ...customerSchema,
+        data: {
+          id: 10002,
+          name: 'Teste',
+          age: 18,
+          birthday: '1988-06-10',
+          deleted: false
+        }
+      }
     })
 
     it('mount insert query of schema.', function () {
       const sql = sqlInsert(schema)
       const expectedQuery = `
 INSERT INTO customers (id, name, age, birthday, deleted)
-       VALUES ('a1b2c3d4', 'Teste', 18, '1988-06-10', false)
+       VALUES (10002, 'Teste', 18, '1988-06-10', false)
        RETURNING id, name, age, birthday, deleted;
 `.trim()
 
@@ -32,7 +35,7 @@ INSERT INTO customers (id, name, age, birthday, deleted)
       const sql = sqlInsert(schema)
       const expectedQuery = `
 INSERT INTO customers (id, name, birthday, deleted)
-       VALUES ('a1b2c3d4', 'Teste', '1988-06-10', false)
+       VALUES (10002, 'Teste', '1988-06-10', false)
        RETURNING id, name, age, birthday, deleted;
 `.trim()
 
@@ -44,8 +47,8 @@ INSERT INTO customers (id, name, birthday, deleted)
       schema.data.birthday = null
       const sql = sqlInsert(schema)
       const expectedQuery = `
-INSERT INTO customers (id, name, deleted)
-       VALUES ('a1b2c3d4', 'Teste', false)
+INSERT INTO customers (id, name, birthday, deleted)
+       VALUES (10002, 'Teste', null, false)
        RETURNING id, name, age, birthday, deleted;
 `.trim()
 

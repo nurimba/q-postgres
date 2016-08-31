@@ -1,42 +1,131 @@
-import {pool, orm} from '../src'
+import {pool, orm, types} from '../src'
 import chai from 'chai'
 import chaiPromised from 'chai-as-promised'
 import mochaPromised from 'mocha-as-promised'
+
+const {
+  DATE,
+  TEXT,
+  NAME,
+  EMAIL,
+  CHAR1,
+  CHAR2,
+  CHAR8,
+  PHONE,
+  SELECT,
+  INTEGER,
+  CPFCNPJ,
+  BOOLEAN,
+  PRIMARY,
+  REFERENCES
+} = types
 
 mochaPromised()
 chai.use(chaiPromised)
 const {expect} = chai
 
-const customerStructure = {
+const customerSchema = {
   table: 'customers',
 
   fields: {
-    id: { type: String },
-    name: { type: String },
-    age: { type: Number },
-    birthday: { type: Date },
-    deleted: { type: Boolean }
+    id: PRIMARY,
+    name: NAME,
+    age: INTEGER,
+    birthday: DATE,
+    deleted: BOOLEAN
   }
 }
 
-const childrenStructure = {
+const childrenSchema = {
   table: 'children',
 
   fields: {
-    id: { type: String },
-    name: { type: String },
-    age: { type: Number },
-    birthday: { type: Date },
-    deleted: { type: Boolean },
-    customer: { type: String }
+    id: PRIMARY,
+    name: NAME,
+    age: INTEGER,
+    birthday: DATE,
+    deleted: BOOLEAN,
+    customer: {type: REFERENCES, table: 'customers'}
   }
 }
 
-const customerSchema = orm(customerStructure)
-const childrenSchema = orm(childrenStructure)
+const phoneSchema = {
+  table: 'phones',
+
+  fields: {
+    id: PRIMARY,
+    name: NAME,
+    phone: PHONE,
+    deleted: BOOLEAN,
+    person: {type: REFERENCES, table: 'persons'}
+  }
+}
+
+const emailSchema = {
+  table: 'emails',
+
+  fields: {
+    id: PRIMARY,
+    name: NAME,
+    email: EMAIL,
+    deleted: BOOLEAN,
+    person: {type: REFERENCES, table: 'persons'}
+  }
+}
+
+const personStructure = {
+  table: 'persons',
+
+  fields: {
+    id: PRIMARY,
+    typeDoc: CHAR1,
+    codeDoc: CPFCNPJ,
+    birthday: DATE,
+    name: NAME,
+    nickName: NAME,
+    observation: TEXT,
+    deleted: BOOLEAN,
+
+    addrUf: CHAR2,
+    addrZipCode: CHAR8,
+    addrCity: NAME,
+    addrNeighborhood: NAME,
+    addrStreet: NAME,
+    addrAdjunct: NAME
+  },
+
+  hasMany: {
+    phones: {schema: phoneSchema, field: 'person'},
+    emails: {schema: emailSchema, field: 'person'}
+  }
+}
+
+let personSchema = {...personStructure}
+personSchema.manyToMany = {
+  kinships: {
+    schema: {...personStructure, kinship: SELECT},
+    table: 'kinships',
+    parent: 'person',
+    reference: 'relationship',
+    extraFields: {
+      kinship: SELECT,
+      deleted: BOOLEAN
+    }
+  }
+}
+
+const phoneORM = orm(phoneSchema)
+const emailORM = orm(emailSchema)
+const personORM = orm(personSchema)
+const customerORM = orm(customerSchema)
+const childrenORM = orm(childrenSchema)
 
 const dropTables = async(connection) => {
   await connection.startTransaction()
+  await connection.execute('DROP TABLE IF EXISTS emails;')
+  await connection.execute('DROP TABLE IF EXISTS phones;')
+  await connection.execute('DROP TABLE IF EXISTS kinships;')
+  await connection.execute('DROP TABLE IF EXISTS persons;')
   await connection.execute('DROP TABLE IF EXISTS children;')
   await connection.execute('DROP TABLE IF EXISTS customers;')
   await connection.commit()
@@ -47,22 +136,65 @@ const createTables = async(connection) => {
   await connection.startTransaction()
   await connection.execute(`
     CREATE TABLE customers (
-      id       SERIAL PRIMARY KEY,
-      name     VARCHAR(255),
-      age      INTEGER,
-      birthday DATE,
-      deleted  BOOLEAN
+      id       ${PRIMARY} PRIMARY KEY,
+      name     ${NAME},
+      age      ${INTEGER},
+      birthday ${DATE},
+      deleted  ${BOOLEAN}
     );
 
     CREATE TABLE children (
-      id       SERIAL PRIMARY KEY,
-      name     VARCHAR(255),
-      age      INTEGER,
-      birthday DATE,
-      deleted  BOOLEAN,
+      id       ${PRIMARY} PRIMARY KEY,
+      name     ${NAME},
+      age      ${INTEGER},
+      birthday ${DATE},
+      deleted  ${BOOLEAN},
       customer INTEGER NOT NULL REFERENCES customers(id)
     );
+
+    CREATE TABLE persons (
+      id          ${PRIMARY} PRIMARY KEY,
+      typeDoc     ${CHAR1},
+      codeDoc     ${CPFCNPJ},
+      birthday    ${DATE},
+      name        ${NAME},
+      nickName    ${NAME},
+      observation ${TEXT},
+      deleted     ${BOOLEAN},
+
+      addrUf           ${CHAR2},
+      addrZipCode      ${CHAR8},
+      addrCity         ${NAME},
+      addrNeighborhood ${NAME},
+      addrStreet       ${NAME},
+      addrAdjunct      ${NAME}
+    );
+
+    CREATE TABLE emails (
+      id      ${PRIMARY} PRIMARY KEY,
+      name    ${NAME},
+      email   ${EMAIL},
+      deleted ${BOOLEAN},
+      person  INTEGER NOT NULL REFERENCES persons(id)
+    );
+
+    CREATE TABLE phones (
+      id      ${PRIMARY} PRIMARY KEY,
+      name    ${NAME},
+      phone   ${PHONE},
+      deleted ${BOOLEAN},
+      person  INTEGER NOT NULL REFERENCES persons(id)
+    );
+
+    CREATE TABLE kinships (
+      id      ${PRIMARY} PRIMARY KEY,
+      deleted ${BOOLEAN},
+      kinship ${SELECT},
+      person INTEGER NOT NULL REFERENCES persons(id),
+      relationship INTEGER NOT NULL REFERENCES persons(id)
+    );
   `)
+
   await connection.commit()
   return new Promise(resolve => setTimeout(() => resolve(connection), 350))
 }
@@ -82,10 +214,21 @@ before(function (done) {
     Object.assign(this, {
       expect,
       connection,
+
+      phoneORM,
+      phoneSchema,
+
+      emailORM,
+      emailSchema,
+
+      personORM,
+      personSchema,
+
+      customerORM,
       customerSchema,
-      childrenSchema,
-      customerStructure,
-      childrenStructure
+
+      childrenORM,
+      childrenSchema
     })
   }).then(done).catch(done)
 })

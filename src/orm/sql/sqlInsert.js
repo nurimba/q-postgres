@@ -1,20 +1,27 @@
-import {objToListFields, fieldIsString} from './sqlUtils'
+import {forceString, columnIsString} from './sqlUtils'
 
-const getListFields = ({data}) => Object.keys(data).filter(filterData.bind(this, data)).join(', ')
-const getListReturning = ({fields}) => Object.keys(fields).join(', ')
-
-const filterData = (data, field) => {
-  const value = data[field]
-  return value !== undefined && value !== null
+const getListFields = ({fields, data}) => {
+  return Object.keys(fields).filter((field) => {
+    return data.hasOwnProperty(field) && data[field] !== undefined
+  })
 }
 
+const getListReturning = ({fields}) => Object.keys(fields).join(', ')
+
 const getListValues = ({fields, data}) => {
-  const selectFields = objToListFields({fields})
-  return Object.keys(data).filter(filterData.bind(this, data)).map((field) => {
+  const listFields = getListFields({fields, data})
+
+  const listValues = listFields.map((field) => {
     const value = data[field]
-    const isString = fieldIsString(selectFields, field)
-    return isString ? `'${String(value).replace('\'', '\\\'')}'` : value
-  }).join(', ')
+    if (value === null) return 'null'
+    const isString = columnIsString(fields[field])
+    return isString ? forceString(value) : value
+  })
+
+  return {
+    listFields: listFields.join(', '),
+    listValues: listValues.join(', ')
+  }
 }
 
 const toSQL = ({table, listFields, listValues, listReturning}) => `
@@ -24,8 +31,7 @@ INSERT INTO ${table} (${listFields})
 `.trim()
 
 export default ({table, fields, data}) => {
-  const listFields = getListFields({data})
-  const listValues = getListValues({fields, data})
   const listReturning = getListReturning({fields})
+  const {listValues, listFields} = getListValues({fields, data, listFields})
   return toSQL({table, listFields, listValues, listReturning})
 }

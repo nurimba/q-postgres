@@ -12,7 +12,7 @@ const getListValues = ({select, data}) => Object.keys(data).filter(filterData.bi
   const value = data[field]
   if (value === null) return `${field} = null`
   const isString = fieldIsString(select, field)
-  return isString ? `${field} = '${String(value).replace('\'', '\\\'')}'` : `${field} = ${value}`
+  return isString ? `${field} = '${String(value).replace('\'', '\\\'').replace('"', '\\"')}'` : `${field} = ${value}`
 }).join(`,${breakLine}      `)
 
 const toSQL = ({table, setters, conditional, listReturning}) => `

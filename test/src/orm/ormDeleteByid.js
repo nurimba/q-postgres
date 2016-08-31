@@ -4,8 +4,8 @@ describe('orm', () => {
 
     beforeEach(function () {
       expect = this.expect
-      const {connection, customerSchema} = this
-      customerModel = customerSchema(connection)
+      const {connection, customerORM} = this
+      customerModel = customerORM(connection)
     })
 
     it('delete data by id.', async () => {
