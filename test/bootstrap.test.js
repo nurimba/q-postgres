@@ -1,5 +1,4 @@
-import orm from '../src/orm'
-import qPostgres from '../src'
+import {pool, orm} from '../src'
 import chai from 'chai'
 import chaiPromised from 'chai-as-promised'
 import mochaPromised from 'mocha-as-promised'
@@ -69,7 +68,7 @@ const createTables = async(connection) => {
 }
 
 before(function (done) {
-  const pool = qPostgres({
+  const pooling = pool({
     user: 'q-postgres',
     database: 'q-postgres',
     password: 'RE7531PH',
@@ -79,7 +78,7 @@ before(function (done) {
     idleTimeoutMillis: 30000
   })
 
-  pool.connect().then(dropTables).then(createTables).then((connection) => {
+  pooling.connect().then(dropTables).then(createTables).then((connection) => {
     Object.assign(this, {
       expect,
       connection,

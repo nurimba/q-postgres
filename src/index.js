@@ -1,5 +1,6 @@
 import {Pool} from 'pg'
 import qOrm from './orm'
+export const orm = qOrm
 
 const BEGIN = 'BEGIN'
 const COMMIT = 'COMMIT'
@@ -23,7 +24,6 @@ const runSql = (client, sql) => {
 
 const factoryConnection = async (pool) => {
   const client = await getConnection(pool)
-
   return {
     release: async () => client.release(),
     execute: runSql.bind(this, client),
@@ -33,9 +33,7 @@ const factoryConnection = async (pool) => {
   }
 }
 
-export const orm = qOrm
-
-export default (config) => {
+export const pool = (config) => {
   const pool = new Pool(config)
   const connect = factoryConnection.bind(this, pool)
   return {connect}

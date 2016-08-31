@@ -14,6 +14,7 @@ module.exports = {
   },
 
   output: {
+    libraryTarget: 'commonjs2',
     path: path.join(__dirname, 'dist'),
     filename: 'q-postgres.min.js'
   },
