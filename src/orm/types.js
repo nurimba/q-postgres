@@ -1,0 +1,23 @@
+const CHAR2 = 'CHAR(2)'
+const CHAR1 = 'CHAR(1)'
+const BOOLEAN = 'BOOLEAN'
+const INTEGER = 'INTEGER'
+const MONEY = 'NUMERIC(15,2)'
+const PERCENT = 'NUMERIC(15,8)'
+const PRIMARY = 'SERIAL NOT NULL'
+const REFERENCES = 'REFERENCES'
+const STRING = 'VARCHAR(255)'
+const TEXT = 'TEXT'
+
+export default {
+  CHAR2,
+  CHAR1,
+  BOOLEAN,
+  INTEGER,
+  MONEY,
+  PERCENT,
+  PRIMARY,
+  REFERENCES,
+  STRING,
+  TEXT
+}

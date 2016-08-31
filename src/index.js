@@ -1,6 +1,9 @@
 import {Pool} from 'pg'
 import qOrm from './orm'
+import qTypes from './orm/types'
+
 export const orm = qOrm
+export const types = qTypes
 
 const BEGIN = 'BEGIN'
 const COMMIT = 'COMMIT'
@@ -27,9 +30,21 @@ const factoryConnection = async (pool) => {
   return {
     release: async () => client.release(),
     execute: runSql.bind(this, client),
-    commit: runSql.bind(this, client, COMMIT),
-    rollback: runSql.bind(this, client, ROLLBACK),
-    startTransaction: runSql.bind(this, client, BEGIN)
+
+    commit: async () => {
+      await runSql(client, COMMIT)
+      return client
+    },
+
+    rollback: async () => {
+      await runSql(client, ROLLBACK)
+      return client
+    },
+
+    startTransaction: async () => {
+      await runSql(client, BEGIN)
+      return client
+    }
   }
 }
 
