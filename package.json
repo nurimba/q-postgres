@@ -2,7 +2,7 @@
   "name": "q-postgres",
   "version": "1.0.5",
   "description": "Postgres with promises.",
-  "main": "dist/index.js",
+  "main": "dist/q-postgres.min.js",
   "repository": {
     "type": "git",
     "url": "git://github.com/nurimba/q-postgres.git"
