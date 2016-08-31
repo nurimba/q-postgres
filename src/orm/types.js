@@ -1,23 +1,39 @@
-const CHAR2 = 'CHAR(2)'
+const TEXT = 'TEXT'
+const NAME = 'VARCHAR(255)'
+const DATE = 'DATE'
 const CHAR1 = 'CHAR(1)'
+const CHAR2 = 'CHAR(2)'
+const CHAR8 = 'CHAR(8)'
+const EMAIL = 'VARCHAR(50)'
+const PHONE = 'VARCHAR(30)'
+const MONEY = 'NUMERIC(15,2)'
+const STRING = 'VARCHAR(255)'
+const SELECT = 'VARCHAR(25)'
 const BOOLEAN = 'BOOLEAN'
 const INTEGER = 'INTEGER'
-const MONEY = 'NUMERIC(15,2)'
+const CPFCNPJ = 'VARCHAR(14)'
 const PERCENT = 'NUMERIC(15,8)'
 const PRIMARY = 'SERIAL NOT NULL'
+const DATETIME = 'TIMESTAMP'
 const REFERENCES = 'REFERENCES'
-const STRING = 'VARCHAR(255)'
-const TEXT = 'TEXT'
 
 export default {
-  CHAR2,
+  TEXT,
+  DATE,
+  NAME,
   CHAR1,
+  CHAR2,
+  CHAR8,
+  EMAIL,
+  PHONE,
+  MONEY,
+  STRING,
+  SELECT,
   BOOLEAN,
   INTEGER,
-  MONEY,
+  CPFCNPJ,
   PERCENT,
   PRIMARY,
-  REFERENCES,
-  STRING,
-  TEXT
+  DATETIME,
+  REFERENCES
 }
