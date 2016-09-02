@@ -1,6 +1,6 @@
 import {Pool} from 'pg'
-import qOrm from './orm'
-import qTypes from './orm/types'
+import qOrm from 'orm'
+import qTypes from 'orm/types'
 
 export const orm = qOrm
 export const types = qTypes

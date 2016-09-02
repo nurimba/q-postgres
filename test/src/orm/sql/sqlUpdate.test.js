@@ -1,4 +1,4 @@
-import sqlUpdate from '../../../../src/orm/sql/sqlUpdate'
+import sqlUpdate from 'orm/sql/sqlUpdate'
 
 describe('orm', () => {
   describe('sqlUpdate', () => {

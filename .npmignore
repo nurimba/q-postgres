@@ -15,3 +15,5 @@ src
 .eslintrc
 test
 docker
+webpack.prod.js
+webpack.test.js

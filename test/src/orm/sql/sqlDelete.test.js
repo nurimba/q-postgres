@@ -1,4 +1,4 @@
-import sqlDelete from '../../../../src/orm/sql/sqlDelete'
+import sqlDelete from 'orm/sql/sqlDelete'
 
 describe('orm', () => {
   describe('sqlDelete', () => {

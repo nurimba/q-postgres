@@ -1,6 +1,6 @@
-import execute from './execute'
-import sqlSelect from '../sql/sqlSelect'
-import {objToListFields} from '../sql/sqlUtils'
+import execute from 'orm/man/execute'
+import sqlSelect from 'orm/sql/sqlSelect'
+import {objToListFields} from 'orm/sql/sqlUtils'
 
 export default async (schema, connection, value) => {
   const select = objToListFields(schema)

@@ -1,5 +1,5 @@
-import sqlWhere from './sqlWhere'
-import {breakLine, blankLine} from './sqlUtils'
+import sqlWhere from 'orm/sql/sqlWhere'
+import {breakLine, blankLine} from 'orm/sql/sqlUtils'
 
 const toSQL = ({table, selectFields, conditional, limitRows, orderFields, joinTables, groupFields}) => {
   let sql = `
@@ -23,26 +23,26 @@ const pagination = ({limit, page}) => {
   return `LIMIT ${limit} OFFSET ${offset}`
 }
 
+const mapOrder = (select, table, count, seq) => {
+  const {field, order} = seq
+  const tableName = seq.table || table
+
+  const fieldSelect = select.find(fd => {
+    const fieldTable = fd.table || table
+    return fd.field === field && fieldTable === tableName
+  })
+
+  if (!fieldSelect) return `${tableName}.${field} ${order || ''}`.trim()
+
+  let posField = select.indexOf(fieldSelect) + 1
+  if (count) posField++
+  return `${posField} ${order || ''}`.trim()
+}
+
 const orderByFields = ({table, select, orderBy, count}) => {
   if (!orderBy) return ''
-
-  const sequence = orderBy.map((seq) => {
-    const {field, order} = seq
-    const tableName = seq.table || table
-
-    const fieldSelect = select.find(fd => {
-      const fieldName = fd.field
-      const fieldTable = fd.table || table
-      return fieldName === field && fieldTable === tableName
-    })
-
-    if (!fieldSelect) return `${tableName}.${field} ${order || ''}`.trim()
-
-    let posField = select.indexOf(fieldSelect) + 1
-    if (count) posField++
-    return `${posField} ${order || ''}`.trim()
-  }).join(', ')
-
+  const mapOrderBy = mapOrder.bind(this, select, table, count)
+  const sequence = orderBy.map(mapOrderBy).join(', ')
   return sequence ? `ORDER BY ${sequence}` : ''
 }
 

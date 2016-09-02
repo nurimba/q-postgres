@@ -1,17 +1,21 @@
-import {breakLine, fieldIsString} from './sqlUtils'
+import {breakLine, fieldIsString} from 'orm/sql/sqlUtils'
+
+const orCondition = (where, select, table) => {
+  const cond = whereMap({where, select, table}).join(`)${breakLine}    OR (`)
+  return cond ? `(${cond})` : ''
+}
+
+const andCondition = (where, select, table) => {
+  const cond = whereMap({where, select, table}).join(`)${breakLine}   AND (`)
+  return cond ? `(${cond})` : ''
+}
 
 const whereMap = ({where, select, table}) => {
   return where.map((condition) => {
     const {field, comparator, value, or, and} = condition
-    if (or) {
-      const orConditions = whereMap({where: or, select, table}).join(`)${breakLine}    OR (`)
-      return orConditions ? `(${orConditions})` : ''
-    }
 
-    if (and) {
-      const orConditions = whereMap({where: and, select, table}).join(`)${breakLine}   AND (`)
-      return orConditions ? `(${orConditions})` : ''
-    }
+    if (or) return orCondition(or, select, table)
+    if (and) return andCondition(and, select, table)
 
     let tableName = condition.table || table
     const isString = fieldIsString(select, field)

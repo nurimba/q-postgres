@@ -1,12 +1,4 @@
-import {forceString, columnIsString} from './sqlUtils'
-
-const getListFields = ({fields, data}) => {
-  return Object.keys(fields).filter((field) => {
-    return data.hasOwnProperty(field) && data[field] !== undefined
-  })
-}
-
-const getListReturning = ({fields}) => Object.keys(fields).join(', ')
+import {forceString, columnIsString, getListReturning, getListFields} from 'orm/sql/sqlUtils'
 
 const getListValues = ({fields, data}) => {
   const listFields = getListFields({fields, data})

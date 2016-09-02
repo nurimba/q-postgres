@@ -1,5 +1,5 @@
-import sqlSelect from '../../../../src/orm/sql/sqlSelect'
-import {types} from '../../../../src'
+import sqlSelect from 'orm/sql/sqlSelect'
+import {types} from 'q-postgres'
 const {
   DATE,
   NAME,

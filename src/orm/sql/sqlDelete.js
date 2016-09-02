@@ -1,5 +1,5 @@
-import sqlWhere from './sqlWhere'
-import {objToListFields} from './sqlUtils'
+import sqlWhere from 'orm/sql/sqlWhere'
+import {objToListFields} from 'orm/sql/sqlUtils'
 
 const toSQL = ({table, conditional}) => `
 DELETE FROM ${table}

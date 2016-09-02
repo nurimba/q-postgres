@@ -1,15 +1,22 @@
-import execute from './execute'
-import sqlInsert from '../sql/sqlInsert'
-import sqlUpdate from '../sql/sqlUpdate'
-import findByQuery from './findByQuery'
-import types from '../types'
+import execute from 'orm/man/execute'
+import sqlInsert from 'orm/sql/sqlInsert'
+import sqlUpdate from 'orm/sql/sqlUpdate'
+import findByQuery from 'orm/man/findByQuery'
+import types from 'orm/types'
 
 const {PRIMARY} = types
 
-const saveReference = async (id, schema, connection, data) => {
+const saveReference = (id, schema, connection, data) => {
   return id
     ? updateRowById(schema, connection, id, data)
     : insertRow(schema, connection, data)
+}
+
+const saveHasMany = (hasManyField, connection, rowParent, row) => {
+  const {id} = row
+  const {field, schema} = hasManyField
+  const reference = Object.assign({}, row, {[field]: rowParent.id})
+  return saveReference(id, schema, connection, reference)
 }
 
 const persistHasMany = async ({schema, connection, data, rowParent}) => {
@@ -18,18 +25,68 @@ const persistHasMany = async ({schema, connection, data, rowParent}) => {
   if (!hasMany) return references
 
   await Promise.all(Object.keys(hasMany).map(async (field) => {
-    const fieldReference = hasMany[field].field
-    const schemaReference = hasMany[field].schema
     const rows = data[field] || []
-
-    references[field] = await Promise.all(rows.map(async (row) => {
-      const {id} = row
-      const reference = Object.assign({}, row, {[fieldReference]: rowParent.id})
-      return saveReference(id, schemaReference, connection, reference)
-    }))
+    const hasManyField = hasMany[field]
+    const saveHasManyRow = saveHasMany.bind(this, hasManyField, connection, rowParent)
+    references[field] = await Promise.all(rows.map(saveHasManyRow))
   }))
 
   return references
+}
+
+const getExtraData = ({extraFields, row}) => {
+  let extraData = {}
+
+  Object.keys(extraFields).forEach((field) => {
+    extraData[field] = row[field]
+    delete row[field]
+  })
+
+  return extraData
+}
+
+const mountSchemaMany = (manyToManyField) => {
+  const {extraFields, parent, table, reference} = manyToManyField
+  return {
+    table,
+
+    fields: Object.assign({
+      id: PRIMARY,
+      [parent]: PRIMARY,
+      [reference]: PRIMARY
+    }, extraFields)
+  }
+}
+
+const mountManyWhere = ({parent, reference}, rowParent, rowSaved) => ({
+  [parent]: `eq:${rowParent.id}`,
+  [reference]: `eq:${rowSaved.id}`
+})
+
+const mountManyData = ({parent, reference, extraFields}, extraData, manyId, rowParent, rowSaved) => Object.assign({
+  id: manyId,
+  [parent]: rowParent.id,
+  [reference]: rowSaved.id
+}, extraData)
+
+const getManyAttrs = async (manyToManyField, connection, rowParent, rowSaved) => {
+  const manySchema = mountSchemaMany(manyToManyField)
+  const manyWhere = mountManyWhere(manyToManyField, rowParent, rowSaved)
+  const rows = await findByQuery(manySchema, connection, manyWhere)
+  const manyRow = rows.pop()
+  const manyId = manyRow ? manyRow.id : undefined
+  return {manySchema, manyId}
+}
+
+const mountManyReferences = async (manyToManyField, connection, rowParent, row) => {
+  const {id} = row
+  const {schema, extraFields} = manyToManyField
+  const extraData = getExtraData({extraFields, row})
+  const rowSaved = await saveReference(id, schema, connection, row)
+  const {manySchema, manyId} = await getManyAttrs(manyToManyField, connection, rowParent, rowSaved)
+  const manyData = mountManyData(manyToManyField, extraData, manyId, rowParent, rowSaved)
+  await saveReference(manyId, manySchema, connection, manyData)
+  return Object.assign({}, rowSaved, extraData)
 }
 
 const persistManyToMany = async ({schema, connection, data, rowParent}) => {
@@ -38,47 +95,10 @@ const persistManyToMany = async ({schema, connection, data, rowParent}) => {
   if (!manyToMany) return references
 
   await Promise.all(Object.keys(manyToMany).map(async (field) => {
-    const {extraFields, parent, table, reference} = manyToMany[field]
-    const schemaReference = manyToMany[field].schema
     const rows = data[field] || []
-
-    references[field] = await Promise.all(rows.map(async (row) => {
-      let extraData = {}
-      Object.keys(extraFields).forEach((field) => {
-        extraData[field] = row[field]
-        delete row[field]
-      })
-
-      const {id} = row
-      const rowSaved = await saveReference(id, schemaReference, connection, row)
-
-      const manySchema = {
-        table,
-
-        fields: Object.assign({
-          id: PRIMARY,
-          [parent]: PRIMARY,
-          [reference]: PRIMARY
-        }, extraFields)
-      }
-
-      const manyWhere = {
-        [parent]: `eq:${rowParent.id}`,
-        [reference]: `eq:${rowSaved.id}`
-      }
-
-      const rows = await findByQuery(manySchema, connection, manyWhere)
-      const manyRow = rows.pop()
-      const manyId = manyRow ? manyRow.id : undefined
-      const manyData = Object.assign({
-        id: manyId,
-        [parent]: rowParent.id,
-        [reference]: rowSaved.id
-      }, extraData)
-
-      await saveReference(manyId, manySchema, connection, manyData)
-      return Object.assign({}, rowSaved, extraData)
-    }))
+    const manyToManyField = manyToMany[field]
+    const manyToManySave = mountManyReferences.bind(this, manyToManyField, connection, rowParent)
+    references[field] = await Promise.all(rows.map(manyToManySave))
   }))
 
   return references

@@ -1,5 +1,5 @@
-import execute from './execute'
-import sqlDelete from '../sql/sqlDelete'
+import execute from 'orm/man/execute'
+import sqlDelete from 'orm/sql/sqlDelete'
 
 export default async (schema, connection, value) => {
   const where = [{field: 'id', comparator: '=', value}]

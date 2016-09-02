@@ -1,4 +1,4 @@
-import sqlInsert from '../../../../src/orm/sql/sqlInsert'
+import sqlInsert from 'orm/sql/sqlInsert'
 
 describe('orm', () => {
   describe('sqlInsert', () => {

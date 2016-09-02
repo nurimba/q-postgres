@@ -1,8 +1,8 @@
-import findById from './man/findById'
-import deleteById from './man/deleteById'
-import findByQuery from './man/findByQuery'
-import countByQuery from './man/countByQuery'
-import {insertRow, updateRowById} from './man/createUpdate'
+import findById from 'orm/man/findById'
+import deleteById from 'orm/man/deleteById'
+import findByQuery from 'orm/man/findByQuery'
+import countByQuery from 'orm/man/countByQuery'
+import {insertRow, updateRowById} from 'orm/man/createUpdate'
 
 export default (schema) => (connection) => {
   const orm = {

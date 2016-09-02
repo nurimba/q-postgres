@@ -1,19 +1,16 @@
-import sqlWhere from './sqlWhere'
-import {objToListFields, breakLine, fieldIsString} from './sqlUtils'
+import sqlWhere from 'orm/sql/sqlWhere'
+import {forceString, columnIsString, getListReturning, getListFields, breakLine, objToListFields} from 'orm/sql/sqlUtils'
 
-const getListReturning = ({fields}) => Object.keys(fields).join(', ')
+const getListValues = ({fields, data}) => {
+  const listFields = getListFields({fields, data})
 
-const filterData = (data, field) => {
-  const value = data[field]
-  return value !== undefined
+  return listFields.map((field) => {
+    let value = data[field]
+    if (value === null) value = 'null'
+    if (data[field] !== null && columnIsString(fields[field])) value = forceString(value)
+    return `${field} = ${value}`
+  }).join(`,${breakLine}      `)
 }
-
-const getListValues = ({select, data}) => Object.keys(data).filter(filterData.bind(this, data)).map((field) => {
-  const value = data[field]
-  if (value === null) return `${field} = null`
-  const isString = fieldIsString(select, field)
-  return isString ? `${field} = '${String(value).replace('\'', '\\\'').replace('"', '\\"')}'` : `${field} = ${value}`
-}).join(`,${breakLine}      `)
 
 const toSQL = ({table, setters, conditional, listReturning}) => `
 UPDATE ${table}
@@ -24,7 +21,7 @@ UPDATE ${table}
 
 export default ({table, fields, data, where}) => {
   const select = objToListFields({fields})
-  const setters = getListValues({select, data})
+  const setters = getListValues({fields, data})
   const listReturning = getListReturning({fields})
   const conditional = sqlWhere({select, where, table})
   return toSQL({table, setters, conditional, listReturning})
