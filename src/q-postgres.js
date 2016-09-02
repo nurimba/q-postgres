@@ -27,25 +27,27 @@ const runSql = (client, sql) => {
 
 const factoryConnection = async (pool) => {
   const client = await getConnection(pool)
-  return {
+  const connection = {
     release: async () => client.release(),
     execute: runSql.bind(this, client),
 
     commit: async () => {
       await runSql(client, COMMIT)
-      return client
+      return connection
     },
 
     rollback: async () => {
       await runSql(client, ROLLBACK)
-      return client
+      return connection
     },
 
     startTransaction: async () => {
       await runSql(client, BEGIN)
-      return client
+      return connection
     }
   }
+
+  return connection
 }
 
 export const pool = (config) => {
