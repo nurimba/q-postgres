@@ -4,5 +4,11 @@
     "stage-0"
   ],
 
-  "plugins": ["transform-runtime"]
+  "plugins": ["transform-runtime"],
+
+  "env": {
+    "test": {
+      "plugins": ["istanbul"]
+    }
+  }
 }

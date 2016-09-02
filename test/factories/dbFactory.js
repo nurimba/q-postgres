@@ -36,10 +36,14 @@ export const childrenSchema = {
     id: PRIMARY,
     name: NAME,
     age: INTEGER,
-    birthday: DATE,
+    expired: DATE,
     deleted: BOOLEAN,
-    customer: {type: REFERENCES, table: 'customers'}
+    customer: {type: REFERENCES, schema: customerSchema}
   }
+}
+
+customerSchema.hasMany = {
+  childrens: {schema: childrenSchema, field: 'customer'}
 }
 
 export const phoneSchema = {
@@ -49,8 +53,7 @@ export const phoneSchema = {
     id: PRIMARY,
     name: NAME,
     phone: PHONE,
-    deleted: BOOLEAN,
-    person: {type: REFERENCES, table: 'persons'}
+    deleted: BOOLEAN
   }
 }
 
@@ -61,8 +64,7 @@ export const emailSchema = {
     id: PRIMARY,
     name: NAME,
     email: EMAIL,
-    deleted: BOOLEAN,
-    person: {type: REFERENCES, table: 'persons'}
+    deleted: BOOLEAN
   }
 }
 
@@ -109,6 +111,9 @@ export const personSchema = {
   }
 }
 
+phoneSchema.fields.person = { type: REFERENCES, schema: personSchema }
+emailSchema.fields.person = { type: REFERENCES, schema: personSchema }
+
 export const phoneORM = orm(phoneSchema)
 export const emailORM = orm(emailSchema)
 export const personORM = orm(personSchema)
@@ -142,7 +147,7 @@ export const createTables = async(connection) => {
       id       ${PRIMARY} PRIMARY KEY,
       name     ${NAME},
       age      ${INTEGER},
-      birthday ${DATE},
+      expired  ${DATE},
       deleted  ${BOOLEAN},
       customer INTEGER NOT NULL REFERENCES customers(id)
     );

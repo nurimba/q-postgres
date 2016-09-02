@@ -12,7 +12,8 @@ const {
   STRING,
   SELECT,
   CPFCNPJ,
-  DATETIME
+  DATETIME,
+  REFERENCES
 } = types
 
 export const breakLine = `
@@ -35,9 +36,7 @@ export const stringTypes = [
 ]
 
 export const columnIsString = (typing) => {
-  let type
-  if (typeof typing === 'string') type = typing
-  if (typeof typing === 'object') type = typing.type
+  const type = getType(typing)
   return stringTypes.indexOf(type) > -1
 }
 
@@ -51,17 +50,50 @@ export const getListFields = ({fields, data}) => {
 
 export const forceString = (str) => `'${String(str).replace('\'', '\\\'').replace('"', '\\"')}'`
 
-export const fieldIsString = (select, fieldName) => Boolean(select.find(({field, type}) => {
+export const fieldIsString = (select, fieldName) => Boolean(select && select.find(({field, type}) => {
   if (fieldName !== field) return false
   return stringTypes.indexOf(type) > -1
 }))
 
-export const objToListFields = ({fields}) => Object.keys(fields).map((field) => {
-  const typing = fields[field]
-  let type
-  if (typeof typing === 'string') type = typing
-  if (typeof typing === 'object') type = typing.type
+const getType = (typing) => {
+  if (typeof typing === 'object') return typing.type
+  return typing
+}
 
+const getFieldsHasMany = (hasMany, fieldsTypes) => {
+  if (!hasMany) return
+  Object.keys(hasMany).forEach((field) => getFieldsTypes(hasMany[field].schema, fieldsTypes))
+}
+
+const getFieldsManyToMany = (manyToMany, fieldsTypes) => {
+  if (!manyToMany) return
+  Object.keys(manyToMany).forEach((field) => {
+    const {table, extraFields, schema} = manyToMany[field]
+    getFieldsTypes(schema, fieldsTypes)
+    getFieldsTypes({table, fields: extraFields}, fieldsTypes)
+  })
+}
+
+export const getFieldsTypes = (schema, fieldsTypes) => {
+  if (!fieldsTypes) fieldsTypes = {_tables: {}}
+  const {table, fields, hasMany, manyToMany} = schema
+  if (fieldsTypes._tables.hasOwnProperty(table)) return {}
+  fieldsTypes._tables[table] = null
+
+  Object.keys(fields).forEach((field) => {
+    const type = getType(fields[field])
+    fieldsTypes[`${table}.${field}`] = type
+    if (type === REFERENCES) getFieldsTypes(fields[field].schema, fieldsTypes)
+  })
+
+  getFieldsHasMany(hasMany, fieldsTypes)
+  getFieldsManyToMany(manyToMany, fieldsTypes)
+
+  return fieldsTypes
+}
+
+export const objToListFields = ({fields}) => Object.keys(fields).map((field) => {
+  const type = getType(fields[field])
   return {type, field}
 })
 

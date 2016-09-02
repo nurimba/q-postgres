@@ -6,8 +6,9 @@ DELETE FROM ${table}
 ${conditional};
 `.trim()
 
-export default ({table, fields, where}) => {
-  const select = objToListFields({fields})
-  const conditional = sqlWhere({select, where, table})
+export default (schema) => {
+  const {table, fields} = schema
+  const schemaWithSelect = Object.assign({}, schema, {select: objToListFields({fields})})
+  const conditional = sqlWhere(schemaWithSelect)
   return toSQL({table, conditional})
 }

@@ -27,10 +27,10 @@ const mapOrder = (select, table, count, seq) => {
   const {field, order} = seq
   const tableName = seq.table || table
 
-  const fieldSelect = select.find(fd => {
+  const fieldSelect = select ? select.find(fd => {
     const fieldTable = fd.table || table
     return fd.field === field && fieldTable === tableName
-  })
+  }) : undefined
 
   if (!fieldSelect) return `${tableName}.${field} ${order || ''}`.trim()
 
@@ -40,7 +40,9 @@ const mapOrder = (select, table, count, seq) => {
 }
 
 const orderByFields = ({table, select, orderBy, count}) => {
+  if (!select) return ''
   if (!orderBy) return ''
+
   const mapOrderBy = mapOrder.bind(this, select, table, count)
   const sequence = orderBy.map(mapOrderBy).join(', ')
   return sequence ? `ORDER BY ${sequence}` : ''
@@ -79,7 +81,7 @@ const mountFieldNameAlias = (table, field, func) => {
 
 const prepareSelect = (schema) => {
   const {select} = schema
-
+  if (!select) return []
   return select.filter(filterSelect.bind(this, schema)).map((conf) => {
     const {table, grouping} = schema
     const {field, func} = conf
@@ -102,18 +104,18 @@ const groupBy = ({select, table, count}) => {
   if (!select) return ''
   const grouping = true
   const fields = prepareSelect({select, table, grouping}).join(', ')
-  const withFunc = Boolean(select.find(({func}) => Boolean(func)))
+  const withFunc = Boolean(select && select.find(({func}) => Boolean(func)))
   const withGroupBy = (count || withFunc) && fields
   if (withGroupBy) return `GROUP BY ${fields}`
   return ''
 }
 
-export default ({table, select, where, distinct, limit, page, orderBy, joins, count}) => {
-  const selectFields = selFields({table, select, count, distinct})
-  const orderFields = orderByFields({table, select, orderBy, count})
-  const joinTables = joinReferences({joins})
-  const conditional = sqlWhere({select, where, table})
-  const limitRows = pagination({limit, page})
-  const groupFields = groupBy({select, table, count})
-  return toSQL({table, selectFields, conditional, limitRows, orderFields, joinTables, groupFields})
+export default (schema) => {
+  const selectFields = selFields(schema)
+  const orderFields = orderByFields(schema)
+  const joinTables = joinReferences(schema)
+  const conditional = sqlWhere(schema)
+  const limitRows = pagination(schema)
+  const groupFields = groupBy(schema)
+  return toSQL(Object.assign({selectFields, conditional, limitRows, orderFields, joinTables, groupFields}, schema))
 }

@@ -104,9 +104,9 @@ describe('orm', () => {
       const customer1 = await customerModel.create({name: 'Customer Query 1', age: 20, birthday: '1988-07-10', deleted: true})
       const customer2 = await customerModel.create({name: 'Customer Query 12', age: 21, birthday: '1988-08-10', deleted: false})
       const customer3 = await customerModel.create({name: 'Customer Query 123', age: 22, birthday: '1988-09-10', deleted: false})
-      await childrenModel.create({name: 'Child Query 1', age: 11, birthday: '1994-07-10', deleted: true, customer: customer1.id})
-      await childrenModel.create({name: 'Child Query 12', age: 12, birthday: '1994-08-10', deleted: false, customer: customer2.id})
-      await childrenModel.create({name: 'Child Query 123', age: 13, birthday: '1994-09-10', deleted: false, customer: customer3.id})
+      await childrenModel.create({name: 'Child Query 1', age: 11, expired: '1994-07-10', deleted: true, customer: customer1.id})
+      await childrenModel.create({name: 'Child Query 12', age: 12, expired: '1994-08-10', deleted: false, customer: customer2.id})
+      await childrenModel.create({name: 'Child Query 123', age: 13, expired: '1994-09-10', deleted: false, customer: customer3.id})
 
       customerModel.join('JOIN children ON (children.customer = customers.id)')
       let rows
@@ -129,22 +129,22 @@ describe('orm', () => {
       rows = await customerModel.findByQuery({'children.age': 'df:11'})
       expect(rows.length).to.equal(2)
 
-      rows = await customerModel.findByQuery({'children.birthday': 'eq:1994-07-10'})
+      rows = await customerModel.findByQuery({'children.expired': 'eq:1994-07-10'})
       expect(rows.length).to.equal(1)
 
-      rows = await customerModel.findByQuery({'children.birthday': 'lt:1994-07-10'})
+      rows = await customerModel.findByQuery({'children.expired': 'lt:1994-07-10'})
       expect(rows.length).to.equal(0)
 
-      rows = await customerModel.findByQuery({'children.birthday': 'gt:1994-07-10'})
+      rows = await customerModel.findByQuery({'children.expired': 'gt:1994-07-10'})
       expect(rows.length).to.equal(2)
 
-      rows = await customerModel.findByQuery({'children.birthday': 'lq:1994-07-10'})
+      rows = await customerModel.findByQuery({'children.expired': 'lq:1994-07-10'})
       expect(rows.length).to.equal(1)
 
-      rows = await customerModel.findByQuery({'children.birthday': 'gq:1994-07-10'})
+      rows = await customerModel.findByQuery({'children.expired': 'gq:1994-07-10'})
       expect(rows.length).to.equal(3)
 
-      rows = await customerModel.findByQuery({'children.birthday': 'df:1994-07-10'})
+      rows = await customerModel.findByQuery({'children.expired': 'df:1994-07-10'})
       expect(rows.length).to.equal(2)
 
       rows = await customerModel.findByQuery({'children.name': 'eq:Child Query 1'})

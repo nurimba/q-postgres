@@ -19,10 +19,10 @@ UPDATE ${table}
   RETURNING ${listReturning};
 `.trim()
 
-export default ({table, fields, data, where}) => {
-  const select = objToListFields({fields})
-  const setters = getListValues({fields, data})
-  const listReturning = getListReturning({fields})
-  const conditional = sqlWhere({select, where, table})
-  return toSQL({table, setters, conditional, listReturning})
+export default (schema) => {
+  const select = objToListFields(schema)
+  const setters = getListValues(schema)
+  const listReturning = getListReturning(schema)
+  const conditional = sqlWhere(Object.assign({select}, schema))
+  return toSQL(Object.assign({setters, conditional, listReturning}, schema))
 }

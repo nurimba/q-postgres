@@ -4,7 +4,10 @@ import {condToWhereList} from 'orm/sql/sqlUtils'
 
 export default async (schema, connection, conditions) => {
   const where = condToWhereList(conditions)
-  const sql = sqlSelect(Object.assign({}, schema, {where, count: true}))
-  const {rows} = await execute(schema, connection, sql)
-  return rows.pop()._counter
+  const countSchema = Object.assign({}, schema, {where, count: true})
+  const sql = sqlSelect(countSchema)
+  const rows = await execute(countSchema, connection, sql)
+  const row = rows.pop()
+  if (!row) return 0
+  return row._counter || 0
 }

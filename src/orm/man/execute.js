@@ -17,8 +17,12 @@ const formatDate = (value) => {
   return `${dt.getFullYear()}-${mon}-${day}`
 }
 
-const formatRow = async (fields, row) => {
+const formatRow = async ({fields, count}, row) => {
   let newRow = {}
+  if (count) {
+    newRow['_counter'] = parseInt(row._counter || 0, 10)
+    if (Object.keys(row).length === 1) return newRow
+  }
 
   Object.keys(fields).forEach((field) => {
     let value = row[field] || row[field.toLowerCase()]
@@ -33,7 +37,7 @@ const formatRow = async (fields, row) => {
   return newRow
 }
 
-export default async ({fields}, {execute}, sql) => {
+export default async (schema, {execute}, sql) => {
   const {rows} = await execute(sql)
-  return Promise.all(rows.map(formatRow.bind(this, fields)))
+  return Promise.all(rows.map(formatRow.bind(this, schema)))
 }
