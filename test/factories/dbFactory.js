@@ -95,11 +95,14 @@ const personStructure = {
   }
 }
 
+const kinshipFields = Object.assign({}, personStructure.fields, {kinship: SELECT})
+const kinship = Object.assign({}, personStructure, {fields: kinshipFields})
+
 export const personSchema = {
   ...personStructure,
   manyToMany: {
     kinships: {
-      schema: {...personStructure, kinship: SELECT},
+      schema: kinship,
       table: 'kinships',
       parent: 'person',
       reference: 'relationship',

@@ -34,12 +34,13 @@ const persistHasMany = async ({schema, connection, data, rowParent}) => {
   return references
 }
 
-const getExtraData = ({extraFields, row}) => {
+const getExtraData = ({extraFields, schema, row}) => {
   let extraData = {}
 
   Object.keys(extraFields).forEach((field) => {
     extraData[field] = row[field]
     delete row[field]
+    delete schema.fields[field]
   })
 
   return extraData
@@ -78,10 +79,16 @@ const getManyAttrs = async (manyToManyField, connection, rowParent, rowSaved) =>
   return {manySchema, manyId}
 }
 
+const cloneSchema = (schema) => {
+  const fields = {...schema.fields}
+  return Object.assign({}, schema, {fields})
+}
+
 const mountManyReferences = async (manyToManyField, connection, rowParent, row) => {
   const {id} = row
-  const {schema, extraFields} = manyToManyField
-  const extraData = getExtraData({extraFields, row})
+  const {extraFields} = manyToManyField
+  const schema = cloneSchema(manyToManyField.schema)
+  const extraData = getExtraData({extraFields, schema, row})
   const rowSaved = await saveReference(id, schema, connection, row)
   const {manySchema, manyId} = await getManyAttrs(manyToManyField, connection, rowParent, rowSaved)
   const manyData = mountManyData(manyToManyField, extraData, manyId, rowParent, rowSaved)

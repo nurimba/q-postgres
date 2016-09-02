@@ -52,6 +52,7 @@ describe('orm', () => {
     it('create many to many data.', async () => {
       const personData = personFactory()
       const kinshipData = personFactory()
+      kinshipData.kinship = 'TIO'
       personData.kinships = [kinshipData]
 
       const customerCreated = await personModel.create(personData)
@@ -59,6 +60,8 @@ describe('orm', () => {
 
       checkPerson(customerCreated, personData)
       checkPerson(kinshipCreated, kinshipData)
+      expect(kinshipCreated.kinship).to.equal('TIO')
+
       expect(kinshipCreated.emails[0].name).to.equal(kinshipData.emails[0].name)
       expect(kinshipCreated.emails[0].email).to.equal(kinshipData.emails[0].email)
       expect(kinshipCreated.emails[0].person).to.equal(kinshipCreated.id)
