@@ -136,7 +136,8 @@ const getFieldTableCondition = (condField) => {
   return {field, table}
 }
 
-export const condToWhereList = (conditions, whereList = []) => {
+export const condToWhereList = (conditions, whereList) => {
+  if (!whereList) whereList = []
   const getComparatorValue = getComparatorValueCondition.bind(this, conditions)
 
   Object.keys(conditions).forEach((condField) => {

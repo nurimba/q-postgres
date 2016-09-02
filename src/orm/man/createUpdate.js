@@ -63,7 +63,7 @@ const mountManyWhere = ({parent, reference}, rowParent, rowSaved) => ({
   [reference]: `eq:${rowSaved.id}`
 })
 
-const mountManyData = ({parent, reference, extraFields}, extraData, manyId, rowParent, rowSaved) => Object.assign({
+const mountManyData = ({parent, reference}, extraData, manyId, rowParent, rowSaved) => Object.assign({
   id: manyId,
   [parent]: rowParent.id,
   [reference]: rowSaved.id
