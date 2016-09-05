@@ -5,28 +5,40 @@ import countByQuery from 'orm/man/countByQuery'
 import {getFieldsTypes} from 'orm/sql/sqlUtils'
 import {insertRow, updateRowById} from 'orm/man/createUpdate'
 
-const joinORM = (orm, ref) => {
-  orm.joins.push(ref)
+const joinORM = (orm, schema, ref) => {
+  schema.joins.push(ref)
+  return orm
+}
+
+const addSelect = (orm, schema, sel) => {
+  schema.select.push(sel)
   return orm
 }
 
 const getORM = (schema, db) => {
   const orm = {
-    joins: [],
     create: insertRow.bind(this, schema, db),
     findById: findById.bind(this, schema, db),
     deleteById: deleteById.bind(this, schema, db),
     updateById: updateRowById.bind(this, schema, db),
-    findByQuery: (query) => findByQuery(Object.assign({}, schema, {joins: orm.joins}), db, query),
-    countByQuery: (query) => countByQuery(Object.assign({}, schema, {joins: orm.joins}), db, query)
+    findByQuery: findByQuery.bind(this, schema, db),
+    countByQuery: countByQuery.bind(this, schema, db)
   }
 
-  orm.join = joinORM.bind(this, orm)
+  orm.join = joinORM.bind(this, orm, schema)
+  orm.addSelect = addSelect.bind(this, orm, schema)
   return orm
 }
 
-export default (schema) => (connection) => {
+const getModel = (schema, connection) => {
+  const schemaModel = {...schema}
+  if (!schemaModel.joins) schemaModel.joins = []
+  if (!schemaModel.select) schemaModel.select = []
+  return getORM(schemaModel, connection)
+}
+
+export default (schema) => {
   const fieldsTypes = getFieldsTypes(schema)
   const schemaTypes = Object.assign({fieldsTypes}, schema)
-  return getORM(schemaTypes, connection)
+  return getModel.bind(this, schemaTypes)
 }

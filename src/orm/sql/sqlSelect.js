@@ -59,9 +59,9 @@ const joinReferences = ({joins}) => {
   }).join(breakLine)
 }
 
-const filterSelect = ({grouping}, {select, func}) => {
+const filterSelect = ({grouping}, {show, func}) => {
   if (grouping && func) return false
-  return (select === undefined || Boolean(select))
+  return (show === undefined || Boolean(show))
 }
 
 const mountFieldName = (table, field, func) => {

@@ -11,19 +11,20 @@ const andCondition = (where, select, table) => {
 }
 
 const verifyString = ({select, field, tableName, fieldsTypes}) => {
+  const isSelect = (select || []).find(sel => sel.field === field && sel.table === tableName)
+  if (isSelect) return fieldIsString(select, field)
   if (fieldsTypes) return columnIsString(fieldsTypes[`${tableName}.${field}`])
-  return fieldIsString(select, field)
+  false
 }
 
-const whereMap = (schema) => {
-  const {where, select, table, fieldsTypes} = schema
-  return where.map((condition) => {
-    const {field, comparator, value, or, and} = condition
+const whereMap = ({table, where, select, fieldsTypes}) => {
+  const tableSchema = table
+  return where.map(({table, field, comparator, value, or, and}) => {
+    const tableName = table || tableSchema
 
-    if (or) return orCondition(or, select, table)
-    if (and) return andCondition(and, select, table)
+    if (or) return orCondition(or, select, tableName)
+    if (and) return andCondition(and, select, tableName)
 
-    let tableName = condition.table || table
     const isString = verifyString({select, field, tableName, fieldsTypes})
     const val = isString ? `'${String(value).replace('\'', '\\\'').replace('"', '\\"')}'` : value
     return `${tableName}.${field} ${comparator} ${val}`

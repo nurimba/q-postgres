@@ -92,10 +92,21 @@ export const getFieldsTypes = (schema, fieldsTypes) => {
   return fieldsTypes
 }
 
-export const objToListFields = ({fields}) => Object.keys(fields).map((field) => {
-  const type = getType(fields[field])
-  return {type, field}
-})
+const leftOutFieldSelect = (select, tableName, fieldName) => !select.find(({field, table}) => field === fieldName && table === tableName)
+
+export const objToListFields = ({table, fields, select}) => {
+  const fieldSelect = (select || []).map(sel => {
+    if (!sel.table) sel.table === table
+    return sel
+  })
+
+  const filterFields = leftOutFieldSelect.bind(this, fieldSelect, table)
+
+  return fieldSelect.concat(Object.keys(fields).filter(filterFields).map((field) => {
+    const type = getType(fields[field])
+    return {type, field, table}
+  }))
+}
 
 const comparators = {
   eq: '=',   // equal
@@ -148,3 +159,37 @@ export const condToWhereList = (conditions, whereList) => {
 
   return whereList
 }
+
+// export const cloneDeep = (obj, ref = {}, cloneRef = {}) => {
+//   let copy
+//
+//   if (obj === null) return obj
+//   if (typeof obj !== 'object') return obj
+//
+//   if (obj instanceof Date) {
+//     copy = new Date()
+//     copy.setTime(obj.getTime())
+//     return copy
+//   }
+//
+//   if (obj instanceof Array) {
+//     copy = []
+//     for (let i = 0, len = obj.length; i < len; i++) copy[i] = cloneDeep(obj[i], ref, cloneRef)
+//     return copy
+//   }
+//
+//   if (obj instanceof Object) {
+//     if (ref[obj]) return cloneRef[obj]
+//     ref[obj] = true
+//     copy = {}
+//     cloneRef[obj] = copy
+//
+//     for (let attr in obj) {
+//       if (obj.hasOwnProperty(attr)) copy[attr] = cloneDeep(obj[attr], ref, cloneRef)
+//     }
+//
+//     return copy
+//   }
+//
+//   throw new Error('Unable to copy obj! Its type isn\'t supported.')
+// }

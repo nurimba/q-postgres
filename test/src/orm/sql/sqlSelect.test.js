@@ -18,11 +18,21 @@ describe('orm', () => {
       schema = {
         ...customerSchema,
         select: [
-          {field: 'id', type: PRIMARY},
-          {field: 'name', type: NAME},
-          {field: 'age', type: INTEGER},
-          {field: 'birthday', type: DATE},
-          {field: 'deleted', type: BOOLEAN}
+          {table: 'customers', show: true, field: 'id', type: PRIMARY},
+          {table: 'customers', show: true, field: 'name', type: NAME},
+          {table: 'customers', show: true, field: 'age', type: INTEGER},
+          {table: 'customers', show: true, field: 'birthday', type: DATE},
+          {table: 'customers', show: true, field: 'deleted', type: BOOLEAN},
+          {table: 'childs', show: false, field: 'id', type: PRIMARY},
+          {table: 'childs', show: false, field: 'name', type: NAME},
+          {table: 'childs', show: false, field: 'age', type: INTEGER},
+          {table: 'childs', show: false, field: 'birthday', type: DATE},
+          {table: 'childs', show: false, field: 'deleted', type: BOOLEAN},
+          {table: 'events', show: false, field: 'id', type: PRIMARY},
+          {table: 'events', show: false, field: 'name', type: NAME},
+          {table: 'events', show: false, field: 'age', type: INTEGER},
+          {table: 'events', show: false, field: 'birthday', type: DATE},
+          {table: 'events', show: false, field: 'deleted', type: BOOLEAN}
         ]
       }
     })
@@ -61,7 +71,7 @@ GROUP BY customers.deleted`.trim()
     })
 
     it('mount select query COUNT without GROUP BY.', function () {
-      schema.select = schema.select.map(field => Object.assign(field, {select: false}))
+      schema.select = schema.select.map(field => Object.assign(field, {show: false}))
       schema.count = true
       const sql = sqlSelect(schema)
       const expectedQuery = `
@@ -289,11 +299,11 @@ WHERE (childs.age = 18)
         table: 'customers',
 
         select: [
-          {field: 'id', type: PRIMARY},
-          {field: 'name', type: NAME},
-          {field: 'age', type: INTEGER, func: 'MAX'},
-          {field: 'birthday', type: DATE, func: 'MIN'},
-          {field: 'deleted', type: BOOLEAN},
+          {table: 'customers', field: 'id', type: PRIMARY},
+          {table: 'customers', field: 'name', type: NAME},
+          {table: 'customers', field: 'age', type: INTEGER, func: 'MAX'},
+          {table: 'customers', field: 'birthday', type: DATE, func: 'MIN'},
+          {table: 'customers', field: 'deleted', type: BOOLEAN},
           {table: 'customers', field: 'other1', type: NAME},
           {table: 'customers', field: 'other2', type: NAME},
 
