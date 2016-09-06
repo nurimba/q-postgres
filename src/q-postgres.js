@@ -19,6 +19,7 @@ const getConnection = async (pool) => {
 const runSql = (client, sql) => {
   return new Promise((resolve, reject) => {
     client.query(sql, (err, result) => {
+      if (process.env.PG_DEBUG === true || process.env.PG_DEBUG === 'EXECUTE') console.log(err, result)
       if (err) return reject(err)
       resolve(result)
     })

@@ -6,6 +6,7 @@ export default async (schema, connection, conditions) => {
   const where = condToWhereList(conditions)
   const countSchema = Object.assign({}, schema, {where, count: true})
   const sql = sqlSelect(countSchema)
+  if (process.env.PG_DEBUG === true || process.env.PG_DEBUG === 'COUNT') console.log(sql)
   const rows = await execute(countSchema, connection, sql)
   const row = rows.pop()
   if (!row) return 0
