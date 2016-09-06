@@ -120,7 +120,6 @@ const persistReferences = async (refParams) => {
 export const insertRow = async (schema, connection, dataCreate) => {
   const data = {...dataCreate}
   const sql = sqlInsert(Object.assign({}, schema, {data}))
-  if (process.env.PG_DEBUG === true || process.env.PG_DEBUG === 'CREATE') console.log(sql)
   const rows = await execute(schema, connection, sql)
   const rowInserted = rows.pop()
   const references = await persistReferences({schema, connection, data, rowParent: rowInserted})
@@ -130,7 +129,6 @@ export const insertRow = async (schema, connection, dataCreate) => {
 export const updateRowById = async (schema, connection, id, data) => {
   const where = [{field: 'id', comparator: '=', value: id}]
   const sql = sqlUpdate(Object.assign({}, schema, {data, where}))
-  if (process.env.PG_DEBUG === true || process.env.PG_DEBUG === 'UPDATE') console.log(sql)
   const rows = await execute(schema, connection, sql)
   const rowUpdated = rows.pop()
   const references = await persistReferences({schema, connection, data, rowParent: rowUpdated})
