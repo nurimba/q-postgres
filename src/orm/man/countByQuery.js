@@ -1,12 +1,17 @@
 import execute from 'orm/man/execute'
 import sqlSelect from 'orm/sql/sqlSelect'
-import {condToWhereList} from 'orm/sql/sqlUtils'
+import {condToWhereList, objToListFields} from 'orm/sql/sqlUtils'
 
 export default async (schema, connection, conditions) => {
   const where = condToWhereList(conditions)
-  const countSchema = Object.assign({}, schema, {where, count: true})
+
+  const select = objToListFields(schema).map(sel => {
+    sel.show = false
+    return sel
+  })
+
+  const countSchema = Object.assign({}, schema, {select, where, count: true})
   const sql = sqlSelect(countSchema)
-  if (process.env.PG_DEBUG === true || process.env.PG_DEBUG === 'COUNT') console.log(sql)
   const rows = await execute(countSchema, connection, sql)
   const row = rows.pop()
   if (!row) return 0
