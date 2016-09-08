@@ -1,86 +1,32 @@
-import chai from 'chai'
-import chaiPromised from 'chai-as-promised'
-import mochaPromised from 'mocha-as-promised'
+import pgORM from 'orm'
+import phoneSchema from 'support/schemas/phoneSchema'
+import emailSchema from 'support/schemas/emailSchema'
+import personSchema from 'support/schemas/personSchema'
+import kinshipSchema from 'support/schemas/kinshipSchema'
+import {createDatabase} from 'support/factories/dbFactory'
 
-import {pool} from 'q-postgres'
-import personFactory from 'factories/personFactory'
-import customerFactory from 'factories/customerFactory'
-import {
-  dbTestConfig,
-  dropTables,
-  createTables,
-  phoneORM,
-  emailORM,
-  personORM,
-  customerORM,
-  childrenORM,
-  phoneSchema,
-  emailSchema,
-  personSchema,
-  customerSchema,
-  childrenSchema
-} from 'factories/dbFactory'
+const schemas = [phoneSchema, emailSchema, personSchema, kinshipSchema]
+const ormSchemas = pgORM(schemas)
 
-mochaPromised()
-chai.use(chaiPromised)
-const {expect} = chai
-
-const checkPerson = (actual, expected) => {
-  expect(actual.id).to.be.above(0)
-  expect(actual.name).to.equal(expected.name)
-  expect(actual.typeDoc).to.equal(expected.typeDoc)
-  expect(actual.codeDoc).to.equal(expected.codeDoc)
-  expect(actual.birthday).to.equal(expected.birthday)
-  expect(actual.nickName).to.equal(expected.nickName)
-  expect(actual.observation).to.equal(expected.observation)
-
-  expect(actual.addrUf).to.equal(expected.addrUf)
-  expect(actual.addrCity).to.equal(expected.addrCity)
-  expect(actual.addrStreet).to.equal(expected.addrStreet)
-  expect(actual.addrZipCode).to.equal(expected.addrZipCode)
-  expect(actual.addrAdjunct).to.equal(expected.addrAdjunct)
-  expect(actual.addrNeighborhood).to.equal(expected.addrNeighborhood)
-}
-
-before(function (done) {
-  const pooling = pool(dbTestConfig)
-
-  pooling.connect().then(dropTables).then(createTables).then((connection) => {
-    Object.assign(this, {
-      expect,
-      connection,
-
-      phoneORM,
-      emailORM,
-      personORM,
-      customerORM,
-      childrenORM,
-
-      phoneSchema,
-      emailSchema,
-      personSchema,
-      customerSchema,
-      childrenSchema,
-
-      checkPerson,
-
-      personFactory,
-      customerFactory
-    })
-  }).then(done).catch(done)
+before(function () {
+  return createDatabase().then(connection => Object.assign(this, {connection}))
 })
 
-beforeEach(function (done) {
+beforeEach(function () {
   const {connection} = this
-  connection.startTransaction().then(() => done()).catch(done)
+  return connection.startTransaction().then(transation => {
+    const ormDatabase = ormSchemas(transation)
+    const personModel = ormDatabase('persons')
+    Object.assign(this, {transation, personModel})
+  })
 })
 
-afterEach(function (done) {
-  const {connection} = this
-  connection.rollback().then(() => done()).catch(done)
+afterEach(function () {
+  const {transation} = this
+  return transation.rollback()
 })
 
-after(function (done) {
+after(function () {
   const {connection} = this
-  dropTables(connection).then(() => connection.release()).then(() => done()).catch(done)
+  return connection.release()
 })

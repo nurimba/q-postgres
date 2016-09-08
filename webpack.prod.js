@@ -10,13 +10,13 @@ module.exports = {
   externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
 
   entry: {
-    bundle: './src/q-postgres.js'
+    bundle: './src/index.js'
   },
 
   output: {
     libraryTarget: 'commonjs2',
     path: path.join(__dirname, 'dist'),
-    filename: 'q-postgres.min.js'
+    filename: 'q-postgres.js'
   },
 
   resolve: {
