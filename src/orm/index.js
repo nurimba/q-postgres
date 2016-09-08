@@ -1,3 +1,4 @@
+import findById from 'orm/findById'
 import selectData from 'orm/select'
 import {insertData, updateData} from 'orm/insUpd'
 
@@ -7,6 +8,7 @@ const ormModel = (tables, connection, modelName) => {
   model.select = selectData.bind(this, connection, schema)
   model.insert = insertData.bind(this, tables, connection, schema)
   model.update = updateData.bind(this, tables, connection, schema)
+  model.findById = findById.bind(this, tables, connection, schema)
   return model
 }
 

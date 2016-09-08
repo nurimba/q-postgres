@@ -1,25 +1,6 @@
 import {insertTable, updateTable} from 'gen'
 import selectData from 'orm/select'
-import {DATE} from 'gen/types'
-
-export const formatDate = (value) => {
-  const dt = new Date(value)
-  const day = `0${dt.getDate()}`.substr(-2)
-  const mon = `0${dt.getMonth() + 1}`.substr(-2)
-  return `${dt.getFullYear()}-${mon}-${day}`
-}
-
-export const getObjRow = (schema, row) => {
-  const data = {}
-
-  Object.keys(schema.fields).forEach(field => {
-    let value = row[field.toLowerCase()]
-    if (schema.fields[field] === DATE) value = formatDate(value)
-    Object.assign(data, {[field]: value})
-  })
-
-  return data
-}
+import objRow from 'orm/objRow'
 
 const saveManyToMany = async (tables, connection, {manyToMany}, rowSaved, data) => {
   const {id} = rowSaved
@@ -89,7 +70,7 @@ export const insertData = async (tables, connection, schema, data) => {
   const insertValues = insertCommand.values
   const insertSQL = insertCommand.toSQL()
   const {rows} = await connection.execute(insertSQL, insertValues)
-  const rowSaved = rows.map(getObjRow.bind(this, schema)).shift()
+  const rowSaved = rows.map(objRow.bind(this, schema)).shift()
   return saveRelations(tables, connection, schema, rowSaved, data)
 }
 
@@ -98,6 +79,6 @@ export const updateData = async (tables, connection, schema, data, conditions) =
   const updateValues = updateCommand.values
   const updateSQL = updateCommand.toSQL()
   const {rows} = await connection.execute(updateSQL, updateValues)
-  const rowSaved = rows.map(getObjRow.bind(this, schema)).shift()
+  const rowSaved = rows.map(objRow.bind(this, schema)).shift()
   return saveRelations(tables, connection, schema, rowSaved, data)
 }
