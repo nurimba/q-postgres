@@ -79,6 +79,8 @@ export const updateData = async (tables, connection, schema, data, conditions) =
   const updateValues = updateCommand.values
   const updateSQL = updateCommand.toSQL()
   const {rows} = await connection.execute(updateSQL, updateValues)
+  if (!rows || !rows.length) return undefined
+
   const rowSaved = rows.map(objRow.bind(this, schema)).shift()
   return saveRelations(tables, connection, schema, rowSaved, data)
 }

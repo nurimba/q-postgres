@@ -85,4 +85,8 @@ export const configDatabase = {
   idleTimeoutMillis: 30000
 }
 
-export const createDatabase = () => qPostgres(configDatabase).connect().then(dropTables).then(createTables)
+export const createDatabase = async () => {
+  const {connect, orm} = qPostgres(configDatabase)
+  const connection = await connect().then(dropTables).then(createTables)
+  return {connect, orm, connection}
+}

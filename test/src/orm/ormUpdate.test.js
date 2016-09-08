@@ -108,5 +108,10 @@ describe('orm', () => {
       expect(rows.length).to.equal(1)
       expect(rows.shift().counter).to.equal(1)
     })
+
+    it('find not found.', async () => {
+      const personUpdated = await personModel.update({name: 'Test'}, {id: 999999999})
+      expect(personUpdated).to.be.undefined
+    })
   })
 })

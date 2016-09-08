@@ -94,5 +94,10 @@ describe('orm', () => {
       expect(phones[0].deleted).to.equal(false)
       expect(phones[0].person).to.equal(id)
     })
+
+    it('find not found.', async () => {
+      const personFound = await personModel.findById(999999999)
+      expect(personFound).to.be.undefined
+    })
   })
 })

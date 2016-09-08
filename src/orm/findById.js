@@ -36,6 +36,8 @@ const findById = async (tables, connection, schema, id, refs = {}) => {
   if (refs.hasOwnProperty(ref)) return refs[ref]
   const select = selectData.bind(this, connection, schema)
   const {rows} = await select().where({id}).limit(1).run()
+  if (!rows || !rows.length) return undefined
+
   const row = rows.map(objRow.bind(this, schema)).shift()
   refs[ref] = row
   await populateHasMany(tables, connection, schema, row, refs)
