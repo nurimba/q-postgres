@@ -19,6 +19,11 @@ const groupBy = (orm, field) => {
   return orm
 }
 
+const join = (orm, joinString) => {
+  orm.joins.push(joinString)
+  return orm
+}
+
 const fromTable = (orm, tableName) => {
   orm.tableName = tableName
   return orm
@@ -39,21 +44,23 @@ const where = (orm, conditions) => {
   return orm
 }
 
-const toSQL = ({tableName, fields, order, group, conditions, limitRows}) => {
+const toSQL = ({tableName, fields, order, group, conditions, limitRows, joins}) => {
   const limit = limitRows ? `${breakline}LIMIT ${limitRows}` : ''
   const orderBy = order && order.length ? `${breakline}ORDER BY ${order.join(', ')}` : ''
   const groupBy = group && group.length ? `${breakline}GROUP BY ${group.join(', ')}` : ''
   const sqlWhere = conditions && conditions.length ? `${breakline}WHERE (${conditions.join(`)${breakline}  AND (`)})` : ''
+  const allJoins = joins && joins.length ? `${breakline}${joins.join(breakline)}` : ''
 
   return `
 SELECT ${fields.join(', ')}
-FROM ${tableName}${sqlWhere}${groupBy}${orderBy}${limit}
+FROM ${tableName}${allJoins}${sqlWhere}${groupBy}${orderBy}${limit}
   `.trim()
 }
 
 export default () => {
-  const orm = {tableName: '', fields: [], order: [], group: [], values: []}
+  const orm = {tableName: '', fields: [], order: [], group: [], values: [], joins: []}
   orm.from = fromTable.bind(this, orm)
+  orm.join = join.bind(this, orm)
   orm.field = field.bind(this, orm)
   orm.toSQL = toSQL.bind(this, orm)
   orm.where = where.bind(this, orm)
