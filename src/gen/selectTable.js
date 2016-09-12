@@ -34,13 +34,19 @@ const limit = (orm, limitRows) => {
   return orm
 }
 
-const where = (orm, conditions) => {
-  orm.conditions = Object.keys(conditions || {}).map((field, index) => {
+const condToStr = (conditions, values, seq = 0) => {
+  return Object.keys(conditions).map((field) => {
+    if (field.toLowerCase() === '$or') return `(${condToStr(conditions[field], values, seq).join(') OR (')})`
+    ++seq
     const {comparator, value} = comWhere(conditions[field])
-    orm.values.push(value)
-    return `${field} ${comparator} $${index + 1}`
+    values.push(value)
+    return `${field} ${comparator} $${seq}`
   })
+}
 
+const where = (orm, conditions) => {
+  if (!conditions) conditions = {}
+  orm.conditions = condToStr(conditions, orm.values)
   return orm
 }
 
