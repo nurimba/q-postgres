@@ -1,4 +1,5 @@
 export const TEXT = 'TEXT'
+export const CITEXT = 'CITEXT'
 export const NAME = 'VARCHAR(255)'
 export const DATE = 'DATE'
 export const CHAR1 = 'CHAR(1)'
@@ -37,5 +38,6 @@ export default {
   PRIMARY,
   DATETIME,
   REFERENCES,
-  NOT_NULL
+  NOT_NULL,
+  CITEXT
 }
