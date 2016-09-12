@@ -34,13 +34,13 @@ const limit = (orm, limitRows) => {
   return orm
 }
 
-const condToStr = (conditions, values, seq = 0) => {
+const condToStr = (conditions, values, seq = {c: 0}) => {
   return Object.keys(conditions).map((field) => {
     if (field.toLowerCase() === '$or') return `(${condToStr(conditions[field], values, seq).join(') OR (')})`
-    ++seq
+    seq.c++
     const {comparator, value} = comWhere(conditions[field])
     values.push(value)
-    return `${field} ${comparator} $${seq}`
+    return `${field} ${comparator} $${seq.c}`
   })
 }
 

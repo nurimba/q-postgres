@@ -49,9 +49,10 @@ describe('orm', () => {
     })
 
     it('select or conditions.', async () => {
+      const {name, kinships} = personCreated
       const $or = {
-        'p.name': `lk:${personCreated.name}`,
-        'k.name': `lk:${personCreated.kinships[0].name}`
+        'p.name': `lk:${name}`,
+        'k.name': `lk:${kinships[0].name}`
       }
 
       const {rows} = await personModel
@@ -59,7 +60,7 @@ describe('orm', () => {
         .from('persons p')
         .join('JOIN kinships r ON (p.id = r.person)')
         .join('JOIN persons k ON (k.id = r.kinship)')
-        .where({$or})
+        .where({'p.deleted': false, $or, 'k.deleted': false})
         .run()
 
       expect(rows[0].id).to.deep.equal(personCreated.id)
