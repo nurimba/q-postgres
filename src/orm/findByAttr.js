@@ -49,4 +49,26 @@ const findById = async (tables, connection, schema, id, refs = {}) => {
   return row
 }
 
-export default findById
+const findBy = async (tables, connection, schema, attr, value) => {
+  const select = selectData.bind(this, connection, schema)
+  const {rows} = await select('id').where({[attr]: value}).run()
+  if (!rows || !rows.length) return []
+
+  const refs = {}
+  const searchsById = rows.map(({id}) => findById(tables, connection, schema, id, refs))
+  return Promise.all(searchsById)
+}
+
+const findByAttr = (tables, connection, schema) => {
+  const findObj = {}
+
+  Object.keys(schema.fields).forEach((field) => {
+    const findAttr = `findBy${field.charAt(0).toUpperCase().concat(field.slice(1))}`
+    if (field === 'id') return (findObj[findAttr] = findById.bind(this, tables, connection, schema))
+    findObj[findAttr] = findBy.bind(this, tables, connection, schema, field)
+  })
+
+  return findObj
+}
+
+export default findByAttr

@@ -1,6 +1,6 @@
-import findById from 'orm/findById'
 import selectData from 'orm/select'
 import deleteData from 'orm/delete'
+import findByAttr from 'orm/findByAttr'
 import {insertData, updateData} from 'orm/insUpd'
 
 const ormModel = (tables, connection, modelName) => {
@@ -10,8 +10,7 @@ const ormModel = (tables, connection, modelName) => {
   model.delete = deleteData.bind(this, connection, schema)
   model.insert = insertData.bind(this, tables, connection, schema)
   model.update = updateData.bind(this, tables, connection, schema)
-  model.findById = findById.bind(this, tables, connection, schema)
-  return model
+  return Object.assign(model, findByAttr(tables, connection, schema))
 }
 
 const ormDatabase = (tables, connection) => ormModel.bind(this, tables, connection)
