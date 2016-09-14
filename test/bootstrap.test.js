@@ -7,7 +7,7 @@ import {createDatabase} from 'support/factories/dbFactory'
 const schemas = [phoneSchema, emailSchema, personSchema, kinshipSchema]
 
 before(function () {
-  return createDatabase(schemas).then(({connection, orm}) => Object.assign(this, {connection, ormSchemas: orm(schemas)}))
+  return createDatabase(schemas).then(({connection, orm}) => Object.assign(this, {connection, orm, ormSchemas: orm(schemas)}))
 })
 
 beforeEach(function () {

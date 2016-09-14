@@ -2,7 +2,7 @@ import {insertTable, updateTable} from 'gen'
 import selectData from 'orm/select'
 import objRow from 'orm/objRow'
 
-const saveManyToMany = async (tables, connection, {manyToMany}, rowSaved, data) => {
+const saveManyToMany = async (orm, tables, connection, {manyToMany}, rowSaved, data) => {
   const {id} = rowSaved
   return Promise.all(Object.keys(manyToMany || {}).map(async (manyToManyField) => {
     const manyToManyRows = data[manyToManyField]
@@ -14,8 +14,8 @@ const saveManyToMany = async (tables, connection, {manyToMany}, rowSaved, data) 
       Object.keys(extraFields).forEach(field => delete manyToManyData[field])
       const manyToManyId = manyToManyData.id
       return manyToManyId
-        ? updateData(tables, connection, manyToManySchema, manyToManyData, {id: manyToManyId})
-        : insertData(tables, connection, manyToManySchema, manyToManyData)
+        ? updateData(orm, tables, connection, manyToManySchema, manyToManyData, {id: manyToManyId})
+        : insertData(orm, tables, connection, manyToManySchema, manyToManyData)
     }))
 
     await Promise.all(manyToManyRows.map(async (manyToManyRow, index) => {
@@ -34,14 +34,14 @@ const saveManyToMany = async (tables, connection, {manyToMany}, rowSaved, data) 
       const dataId = rows && rows.length ? rows.shift().id : undefined
 
       const manyToManySaved = dataId
-        ? await updateData(tables, connection, tables[table], tableData, {id: dataId})
-        : await insertData(tables, connection, tables[table], tableData)
+        ? await updateData(orm, tables, connection, tables[table], tableData, {id: dataId})
+        : await insertData(orm, tables, connection, tables[table], tableData)
       Object.keys(extraFields).forEach(field => Object.assign(rowSaved[manyToManyField][index], {[field]: manyToManySaved[field]}))
     }))
   }))
 }
 
-const saveHasMany = async (tables, connection, {hasMany}, rowSaved, data) => {
+const saveHasMany = async (orm, tables, connection, {hasMany}, rowSaved, data) => {
   const {id} = rowSaved
   await Promise.all(Object.keys(hasMany || {}).map(async (hasManyField) => {
     const hasManyRows = data[hasManyField]
@@ -53,34 +53,44 @@ const saveHasMany = async (tables, connection, {hasMany}, rowSaved, data) => {
       const hasManyData = {...hasManyRow, [field]: id}
       const hasManyId = hasManyData.id
       return hasManyId
-        ? updateData(tables, connection, hasManySchema, hasManyData, {id: hasManyId})
-        : insertData(tables, connection, hasManySchema, hasManyData)
+        ? updateData(orm, tables, connection, hasManySchema, hasManyData, {id: hasManyId})
+        : insertData(orm, tables, connection, hasManySchema, hasManyData)
     }))
   }))
 }
 
-const saveRelations = async (tables, connection, schema, rowSaved, data) => {
-  await saveHasMany(tables, connection, schema, rowSaved, data)
-  await saveManyToMany(tables, connection, schema, rowSaved, data)
+const saveRelations = async (orm, tables, connection, schema, rowSaved, data) => {
+  await saveHasMany(orm, tables, connection, schema, rowSaved, data)
+  await saveManyToMany(orm, tables, connection, schema, rowSaved, data)
   return rowSaved
 }
 
-export const insertData = async (tables, connection, schema, data) => {
+export const insertData = async (orm, tables, connection, schema, data) => {
   const insertCommand = insertTable(schema).objValues(data)
   const insertValues = insertCommand.values
   const insertSQL = insertCommand.toSQL()
   const {rows} = await connection.execute(insertSQL, insertValues)
-  const rowSaved = rows.map(objRow.bind(this, schema)).shift()
-  return saveRelations(tables, connection, schema, rowSaved, data)
+  if (!rows || !rows.length) return undefined
+  let rowSaved = rows.map(objRow.bind(this, schema)).shift()
+
+  let afterSaved
+  if (schema.hasOwnProperty('afterSave')) afterSaved = await schema.afterSave(rowSaved, orm(schema.table), orm)
+  if (afterSaved && afterSaved.id) rowSaved = afterSaved
+
+  return saveRelations(orm, tables, connection, schema, rowSaved, data)
 }
 
-export const updateData = async (tables, connection, schema, data, conditions) => {
+export const updateData = async (orm, tables, connection, schema, data, conditions) => {
   const updateCommand = updateTable(schema).objValues(data, conditions)
   const updateValues = updateCommand.values
   const updateSQL = updateCommand.toSQL()
   const {rows} = await connection.execute(updateSQL, updateValues)
   if (!rows || !rows.length) return undefined
+  let rowSaved = rows.map(objRow.bind(this, schema)).shift()
 
-  const rowSaved = rows.map(objRow.bind(this, schema)).shift()
-  return saveRelations(tables, connection, schema, rowSaved, data)
+  let afterSaved
+  if (schema.hasOwnProperty('afterSave')) afterSaved = await schema.afterSave(rowSaved, orm(schema.table), orm)
+  if (afterSaved && afterSaved.id) rowSaved = afterSaved
+
+  return saveRelations(orm, tables, connection, schema, rowSaved, data)
 }

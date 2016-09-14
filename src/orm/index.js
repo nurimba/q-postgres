@@ -5,11 +5,14 @@ import {insertData, updateData} from 'orm/insUpd'
 
 const ormModel = (tables, connection, modelName) => {
   const schema = JSON.parse(JSON.stringify(tables[modelName]))
+  if (tables[modelName].hasOwnProperty('afterSave')) schema.afterSave = tables[modelName].afterSave
+  const orm = ormModel.bind(this, tables, connection)
+
   const model = {schema}
   model.select = selectData.bind(this, connection, schema)
   model.delete = deleteData.bind(this, connection, schema)
-  model.insert = insertData.bind(this, tables, connection, schema)
-  model.update = updateData.bind(this, tables, connection, schema)
+  model.insert = insertData.bind(this, orm, tables, connection, schema)
+  model.update = updateData.bind(this, orm, tables, connection, schema)
   return Object.assign(model, findByAttr(tables, connection, schema))
 }
 
