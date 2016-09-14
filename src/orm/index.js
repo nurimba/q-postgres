@@ -5,7 +5,10 @@ import {insertData, updateData} from 'orm/insUpd'
 
 const ormModel = (tables, connection, modelName) => {
   const schema = JSON.parse(JSON.stringify(tables[modelName]))
+
   if (tables[modelName].hasOwnProperty('afterSave')) schema.afterSave = tables[modelName].afterSave
+  if (tables[modelName].hasOwnProperty('beforeSave')) schema.beforeSave = tables[modelName].beforeSave
+
   const orm = ormModel.bind(this, tables, connection)
 
   const model = {schema}

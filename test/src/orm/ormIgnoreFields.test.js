@@ -6,17 +6,13 @@ import kinshipSchema from 'support/schemas/kinshipSchema'
 import personFactory from 'support/factories/personFactory'
 
 describe('orm', () => {
-  describe('beforeSave', () => {
+  describe('afterSave', () => {
     let personModel
 
     beforeEach(function () {
       const {transation, orm} = this
-      const beforeSave = (person) => {
-        person.addrCity = '++++++++++++'
-        return person
-      }
-
-      const schemas = [phoneSchema, emailSchema, kinshipSchema, {...personSchema, beforeSave}]
+      const ignoreFields = ['addrCity']
+      const schemas = [phoneSchema, emailSchema, kinshipSchema, {...personSchema, ignoreFields}]
       const ormSchemas = orm(schemas)
       const ormDatabase = ormSchemas(transation)
       personModel = ormDatabase('persons')
@@ -25,7 +21,7 @@ describe('orm', () => {
     it('insert shoul call before save.', async () => {
       const personData = personFactory()
       const {addrCity} = await personModel.insert(personData)
-      expect(addrCity).to.equal('++++++++++++')
+      expect(addrCity).to.be.undefined
     })
   })
 })

@@ -66,6 +66,10 @@ const saveRelations = async (orm, tables, connection, schema, rowSaved, data) =>
 }
 
 export const insertData = async (orm, tables, connection, schema, data) => {
+  let beforeSave
+  if (schema.hasOwnProperty('beforeSave')) beforeSave = await schema.beforeSave(data, orm(schema.table), orm)
+  if (beforeSave && Object.keys(beforeSave).length) data = beforeSave
+
   const insertCommand = insertTable(schema).objValues(data)
   const insertValues = insertCommand.values
   const insertSQL = insertCommand.toSQL()
@@ -77,10 +81,17 @@ export const insertData = async (orm, tables, connection, schema, data) => {
   if (schema.hasOwnProperty('afterSave')) afterSaved = await schema.afterSave(rowSaved, orm(schema.table), orm)
   if (afterSaved && afterSaved.id) rowSaved = afterSaved
 
-  return saveRelations(orm, tables, connection, schema, rowSaved, data)
+  const dataInserted = await saveRelations(orm, tables, connection, schema, rowSaved, data)
+  if (schema.ignoreFields) schema.ignoreFields.forEach(field => delete dataInserted[field])
+
+  return dataInserted
 }
 
 export const updateData = async (orm, tables, connection, schema, data, conditions) => {
+  let beforeSave
+  if (schema.hasOwnProperty('beforeSave')) beforeSave = await schema.beforeSave(data, orm(schema.table), orm)
+  if (beforeSave && Object.keys(beforeSave).length) data = beforeSave
+
   const updateCommand = updateTable(schema).objValues(data, conditions)
   const updateValues = updateCommand.values
   const updateSQL = updateCommand.toSQL()
@@ -91,6 +102,7 @@ export const updateData = async (orm, tables, connection, schema, data, conditio
   let afterSaved
   if (schema.hasOwnProperty('afterSave')) afterSaved = await schema.afterSave(rowSaved, orm(schema.table), orm)
   if (afterSaved && afterSaved.id) rowSaved = afterSaved
-
-  return saveRelations(orm, tables, connection, schema, rowSaved, data)
+  const dataUpdated = await saveRelations(orm, tables, connection, schema, rowSaved, data)
+  if (schema.ignoreFields) schema.ignoreFields.forEach(field => delete dataUpdated[field])
+  return dataUpdated
 }
