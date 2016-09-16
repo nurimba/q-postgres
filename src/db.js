@@ -12,14 +12,22 @@ const getConnection = async (pool) => {
 const runSql = (client, sql, parameters = []) => {
   return new Promise((resolve, reject) => {
     client.query(sql, parameters, (err, result) => {
+      if (client.config.debug) console.log('                          ')
+      if (client.config.debug) console.log('--------------------------')
+      if (client.config.debug) console.log(sql)
+      if (client.config.debug && err) console.log('ERROR: ', err)
+      if (client.config.debug && result) console.log('RESULT: ', result)
+      if (client.config.debug) console.log('--------------------------')
+      if (client.config.debug) console.log('                          ')
       if (err) return reject(err)
       resolve(result)
     })
   })
 }
 
-export default async (pool) => {
+export default async (pool, config) => {
   const client = await getConnection(pool)
+  client.config = config
   const connection = {
     release: async () => client.release(),
     execute: runSql.bind(this, client),

@@ -9,6 +9,6 @@ export const genSQL = generatorsSQL
 
 export default (config) => {
   const pool = new Pool(config)
-  const connect = database.bind(this, pool)
+  const connect = database.bind(this, pool, config)
   return {connect, orm, pool}
 }
