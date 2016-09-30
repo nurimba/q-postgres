@@ -15,6 +15,8 @@ const runSql = (client, sql, parameters = []) => {
       if (client.config.debug) console.log('                          ')
       if (client.config.debug) console.log('--------------------------')
       if (client.config.debug) console.log(sql)
+      if (client.config.debug && sql) console.log(sql)
+      if (client.config.debug && parameters) console.log(parameters)
       if (client.config.debug && err) console.log('ERROR: ', err)
       if (client.config.debug && result) console.log('RESULT: ', result)
       if (client.config.debug) console.log('--------------------------')
