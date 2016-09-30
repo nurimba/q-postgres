@@ -2,6 +2,7 @@ export const TEXT = 'TEXT'
 export const CITEXT = 'CITEXT'
 export const NAME = 'VARCHAR(255)'
 export const DATE = 'DATE'
+export const JSON = 'JSON'
 export const CHAR1 = 'CHAR(1)'
 export const CHAR2 = 'CHAR(2)'
 export const CHAR8 = 'CHAR(8)'
@@ -12,6 +13,7 @@ export const STRING = 'VARCHAR(255)'
 export const SELECT = 'VARCHAR(25)'
 export const BOOLEAN = 'BOOLEAN'
 export const INTEGER = 'INTEGER'
+export const SMALLINT = 'SMALLINT'
 export const CPFCNPJ = 'VARCHAR(14)'
 export const PERCENT = 'NUMERIC(15,8)'
 export const PRIMARY = 'SERIAL PRIMARY KEY'
@@ -22,6 +24,7 @@ export const NOT_NULL = 'NOT NULL'
 export default {
   TEXT,
   DATE,
+  JSON,
   NAME,
   CHAR1,
   CHAR2,
@@ -31,13 +34,14 @@ export default {
   MONEY,
   STRING,
   SELECT,
+  CITEXT,
   BOOLEAN,
   INTEGER,
   CPFCNPJ,
   PERCENT,
   PRIMARY,
   DATETIME,
-  REFERENCES,
+  SMALLINT,
   NOT_NULL,
-  CITEXT
+  REFERENCES
 }
