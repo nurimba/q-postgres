@@ -17,4 +17,8 @@ build:
 database:
 	docker exec -it pc-db psql -h localhost -U q-postgres -d q-postgres
 
+build-es6:
+	docker build -t malera/es6 -f ./docker/DockerfileES6 ./docker
+	docker push malera/es6
+
 default: run
