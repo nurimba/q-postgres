@@ -40,9 +40,8 @@ const setDefault = (orm, {alters}, field, defaultValue) => {
 }
 
 const toSQL = ({tableName, adds, alters, drops, indexs}) => `
-ALTER TABLE ${tableName} (
-  ${adds.concat(alters, drops, indexs).join(`,${breakline}  `)}
-);
+ALTER TABLE ${tableName}
+  ${adds.concat(alters, drops, indexs).join(`,${breakline}  `)};
 `.trim()
 
 const setType = (orm, {alters}, field, type) => {

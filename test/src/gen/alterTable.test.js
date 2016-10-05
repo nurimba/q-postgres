@@ -19,11 +19,10 @@ describe('generate SQL', () => {
         .toSQL()
 
       expect(sqlAlterTable).to.equal(`
-ALTER TABLE persons (
+ALTER TABLE persons
   ADD COLUMN typeDoc CHAR(1) NOT NULL DEFAULT 'J',
   ADD COLUMN codeDoc VARCHAR(14),
-  ADD COLUMN birthday DATE
-);
+  ADD COLUMN birthday DATE;
       `.trim())
     })
 
@@ -35,11 +34,10 @@ ALTER TABLE persons (
         .toSQL()
 
       expect(sqlAlterTable).to.equal(`
-ALTER TABLE persons (
+ALTER TABLE persons
   DROP COLUMN typeDoc RESTRICT,
   DROP COLUMN codeDoc RESTRICT,
-  DROP COLUMN birthday RESTRICT
-);
+  DROP COLUMN birthday RESTRICT;
       `.trim())
     })
 
@@ -51,11 +49,10 @@ ALTER TABLE persons (
         .toSQL()
 
       expect(sqlAlterTable).to.equal(`
-ALTER TABLE persons (
+ALTER TABLE persons
   ALTER COLUMN typeDoc DROP DEFAULT,
   ALTER COLUMN codeDoc DROP DEFAULT,
-  ALTER COLUMN birthday DROP DEFAULT
-);
+  ALTER COLUMN birthday DROP DEFAULT;
       `.trim())
     })
 
@@ -68,12 +65,11 @@ ALTER TABLE persons (
         .toSQL()
 
       expect(sqlAlterTable).to.equal(`
-ALTER TABLE persons (
+ALTER TABLE persons
   ALTER COLUMN typeDoc SET DEFAULT 'F',
   ALTER COLUMN codeDoc SET DEFAULT '01509311157',
   ALTER COLUMN birthday SET DEFAULT '1988-12-31',
-  ALTER COLUMN deleted SET DEFAULT FALSE
-);
+  ALTER COLUMN deleted SET DEFAULT FALSE;
       `.trim())
     })
 
@@ -85,11 +81,10 @@ ALTER TABLE persons (
         .toSQL()
 
       expect(sqlAlterTable).to.equal(`
-ALTER TABLE persons (
+ALTER TABLE persons
   ALTER COLUMN typeDoc TYPE CHAR(1),
   ALTER COLUMN codeDoc TYPE VARCHAR(14),
-  ALTER COLUMN birthday TYPE DATE
-);
+  ALTER COLUMN birthday TYPE DATE;
       `.trim())
     })
 
@@ -101,11 +96,10 @@ ALTER TABLE persons (
         .toSQL()
 
       expect(sqlAlterTable).to.equal(`
-ALTER TABLE persons (
+ALTER TABLE persons
   ALTER COLUMN typeDoc SET NOT NULL,
   ALTER COLUMN codeDoc SET NOT NULL,
-  ALTER COLUMN birthday SET NOT NULL
-);
+  ALTER COLUMN birthday SET NOT NULL;
       `.trim())
     })
 
@@ -117,11 +111,10 @@ ALTER TABLE persons (
         .toSQL()
 
       expect(sqlAlterTable).to.equal(`
-ALTER TABLE persons (
+ALTER TABLE persons
   ALTER COLUMN typeDoc DROP NOT NULL,
   ALTER COLUMN codeDoc DROP NOT NULL,
-  ALTER COLUMN birthday DROP NOT NULL
-);
+  ALTER COLUMN birthday DROP NOT NULL;
       `.trim())
     })
 
@@ -133,11 +126,10 @@ ALTER TABLE persons (
         .toSQL()
 
       expect(sqlAlterTable).to.equal(`
-ALTER TABLE persons (
+ALTER TABLE persons
   RENAME COLUMN typeDoc TO typeDoc2,
   RENAME COLUMN codeDoc TO codeDoc2,
-  RENAME COLUMN birthday TO birthday2
-);
+  RENAME COLUMN birthday TO birthday2;
       `.trim())
     })
 
@@ -149,11 +141,10 @@ ALTER TABLE persons (
         .toSQL()
 
       expect(sqlAlterTable).to.equal(`
-ALTER TABLE persons (
+ALTER TABLE persons
   ADD CONSTRAINT unique_persons_typeDoc UNIQUE (typeDoc),
   ADD CONSTRAINT unique_persons_codeDoc UNIQUE (codeDoc),
-  ADD CONSTRAINT unique_persons_birthday UNIQUE (birthday)
-);
+  ADD CONSTRAINT unique_persons_birthday UNIQUE (birthday);
       `.trim())
     })
 
@@ -165,11 +156,10 @@ ALTER TABLE persons (
         .toSQL()
 
       expect(sqlAlterTable).to.equal(`
-ALTER TABLE persons (
+ALTER TABLE persons
   DROP CONSTRAINT unique_persons_typeDoc,
   DROP CONSTRAINT unique_persons_codeDoc,
-  DROP CONSTRAINT unique_persons_birthday
-);
+  DROP CONSTRAINT unique_persons_birthday;
       `.trim())
     })
 
@@ -181,11 +171,10 @@ ALTER TABLE persons (
         .toSQL()
 
       expect(sqlAlterTable).to.equal(`
-ALTER TABLE persons (
+ALTER TABLE persons
   ADD CONSTRAINT foreign_persons_typeDoc FOREIGN KEY (typeDoc) REFERENCES kinships (id),
   ADD CONSTRAINT foreign_persons_codeDoc FOREIGN KEY (codeDoc) REFERENCES kinships (codeDoc),
-  ADD CONSTRAINT foreign_persons_birthday FOREIGN KEY (birthday) REFERENCES kinships (birthday)
-);
+  ADD CONSTRAINT foreign_persons_birthday FOREIGN KEY (birthday) REFERENCES kinships (birthday);
       `.trim())
     })
 
@@ -197,11 +186,10 @@ ALTER TABLE persons (
         .toSQL()
 
       expect(sqlAlterTable).to.equal(`
-ALTER TABLE persons (
+ALTER TABLE persons
   DROP CONSTRAINT foreign_persons_typeDoc,
   DROP CONSTRAINT foreign_persons_codeDoc,
-  DROP CONSTRAINT foreign_persons_birthday
-);
+  DROP CONSTRAINT foreign_persons_birthday;
       `.trim())
     })
   })
