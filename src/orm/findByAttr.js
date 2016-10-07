@@ -37,7 +37,7 @@ const populateManyToMany = async (tables, connection, schema, row, refs) => {
 
 const findById = async (tables, connection, schema, id, refs = {}) => {
   const ref = `${schema.table}-${id}`
-  if (refs.hasOwnProperty(ref)) return refs[ref]
+  if (refs.hasOwnProperty(ref)) return {...refs[ref]}
   const select = selectData.bind(this, connection, schema)
   const {rows} = await select().where({id}).limit(1).run()
   if (!rows || !rows.length) return undefined
@@ -49,12 +49,12 @@ const findById = async (tables, connection, schema, id, refs = {}) => {
   return row
 }
 
-const findBy = async (tables, connection, schema, attr, value) => {
+const findBy = async (tables, connection, schema, attr, value, refs) => {
   const select = selectData.bind(this, connection, schema)
   const {rows} = await select('id').where({[attr]: value}).run()
   if (!rows || !rows.length) return []
 
-  const refs = {}
+  if (!refs) refs = {}
   const searchsById = rows.map(({id}) => findById(tables, connection, schema, id, refs))
   return Promise.all(searchsById)
 }
