@@ -28,15 +28,14 @@ const fromTable = (orm, tableName) => Object.assign(orm, {tableName})
 const limit = (orm, limitRows) => Object.assign(orm, {limitRows})
 const skip = (orm, skipRows) => Object.assign(orm, {skipRows})
 
-const condToStr = (conditions, values, seq = {c: 0}) => {
+const condToStr = (conditions, values) => {
   return Object.keys(conditions).map((field) => {
     const fieldVal = conditions[field]
-    if (field.toLowerCase() === '$or') return `(${condToStr(fieldVal, values, seq).join(') OR (')})`
-    if (field.toLowerCase() === '$and') return `(${condToStr(fieldVal, values, seq).join(') AND (')})`
-    seq.c++
+    if (field.toLowerCase() === '$or') return `(${condToStr(fieldVal, values).join(') OR (')})`
+    if (field.toLowerCase() === '$and') return `(${condToStr(fieldVal, values).join(') AND (')})`
     const {comparator, value} = comWhere(fieldVal)
     values.push(value)
-    return `${field} ${comparator} $${seq.c}`
+    return `${field} ${comparator} $${values.length}`
   })
 }
 
