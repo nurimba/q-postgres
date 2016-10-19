@@ -32,6 +32,7 @@ const condToStr = (conditions, values, seq = {c: 0}) => {
   return Object.keys(conditions).map((field) => {
     const fieldVal = conditions[field]
     if (field.toLowerCase() === '$or') return `(${condToStr(fieldVal, values, seq).join(') OR (')})`
+    if (field.toLowerCase() === '$and') return `(${condToStr(fieldVal, values, seq).join(') AND (')})`
     seq.c++
     const {comparator, value} = comWhere(fieldVal)
     values.push(value)
