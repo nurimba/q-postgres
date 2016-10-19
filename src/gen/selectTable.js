@@ -42,7 +42,8 @@ const condToStr = (conditions, values, seq = {c: 0}) => {
 
 const where = (orm, conditions) => {
   if (!conditions) conditions = {}
-  orm.conditions = condToStr(conditions, orm.values)
+  if (!orm.conditions) orm.conditions = []
+  orm.conditions = orm.conditions.concat(condToStr(conditions, orm.values))
   return orm
 }
 
