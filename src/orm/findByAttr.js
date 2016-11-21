@@ -8,7 +8,7 @@ const populateHasMany = async (tables, connection, schema, row, refs) => {
     const {table, field} = hasMany[hasManyField]
     const schemaHasMany = tables[table]
     const select = selectData.bind(this, connection, schemaHasMany)
-    const filter = {[field]: row.id}
+    let filter = {[field]: row.id}
     if (schemaHasMany.deleteField) filter[schemaHasMany.deleteField] = false
     const {rows} = await select('id').where(filter).run()
     if (!rows || !rows.length) return
@@ -25,7 +25,7 @@ const populateManyToMany = async (tables, connection, schema, row, refs) => {
     const schemaManyToMany = tables[table]
     const select = selectData.bind(this, connection, schemaManyToMany)
     const listExtraFields = Object.keys(extraFields)
-    const filter = {[primary]: row.id}
+    let filter = {[primary]: row.id}
     if (schemaManyToMany.deleteField) filter[schemaManyToMany.deleteField] = false
     const {rows} = await select(secondary, ...listExtraFields).where(filter).run()
     if (!rows || !rows.length) return
@@ -43,7 +43,9 @@ const findById = async (tables, connection, schema, id, refs = {}) => {
   const ref = `${schema.table}-${id}`
   if (refs.hasOwnProperty(ref)) return {...refs[ref]}
   const select = selectData.bind(this, connection, schema)
-  const {rows} = await select().where({id}).limit(1).run()
+  let filter = {id}
+  if (schema.deleteField) filter[schema.deleteField] = false
+  const {rows} = await select().where(filter).limit(1).run()
   if (!rows || !rows.length) return undefined
 
   const row = rows.map(objRow.bind(this, schema)).shift()
@@ -55,7 +57,9 @@ const findById = async (tables, connection, schema, id, refs = {}) => {
 
 const findBy = async (tables, connection, schema, attr, value, refs) => {
   const select = selectData.bind(this, connection, schema)
-  const {rows} = await select('id').where({[attr]: value}).run()
+  let filter = {[attr]: value}
+  if (schema.deleteField) filter[schema.deleteField] = false
+  const {rows} = await select('id').where(filter).run()
   if (!rows || !rows.length) return []
 
   if (!refs) refs = {}
