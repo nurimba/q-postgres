@@ -9,6 +9,7 @@ const saveManyToMany = async (orm, tables, connection, {manyToMany}, rowSaved, d
     if (!manyToManyRows || !manyToManyRows.length) return
     const {table, primary, secondary, schema, extraFields} = manyToMany[manyToManyField]
     const manyToManySchema = tables[schema]
+
     rowSaved[manyToManyField] = await Promise.all(manyToManyRows.map((manyToManyRow, index) => {
       let manyToManyData = {...manyToManyRow}
       Object.keys(extraFields).forEach(field => delete manyToManyData[field])
@@ -18,6 +19,8 @@ const saveManyToMany = async (orm, tables, connection, {manyToMany}, rowSaved, d
         : insertData(orm, tables, connection, manyToManySchema, manyToManyData)
     }))
 
+    if (manyToManySchema.deleteField) rowSaved[manyToManyField] = rowSaved[manyToManyField].filter((r) => !r[manyToManySchema.deleteField])
+
     await Promise.all(manyToManyRows.map(async (manyToManyRow, index) => {
       const tableData = {}
       Object.keys(extraFields).forEach(field => (tableData[field] = manyToManyRow[field]))
@@ -26,7 +29,7 @@ const saveManyToMany = async (orm, tables, connection, {manyToMany}, rowSaved, d
       tableData[secondary] = secondaryId
       const select = selectData.bind(this, connection, tables[table])
       const {rows} = await select('id')
-        .from('kinships')
+        .from(table)
         .where({[primary]: id, [secondary]: secondaryId})
         .limit(1)
         .run()
@@ -56,6 +59,8 @@ const saveHasMany = async (orm, tables, connection, {hasMany}, rowSaved, data) =
         ? updateData(orm, tables, connection, hasManySchema, hasManyData, {id: hasManyId})
         : insertData(orm, tables, connection, hasManySchema, hasManyData)
     }))
+
+    if (hasManySchema.deleteField) rowSaved[hasManyField] = rowSaved[hasManyField].filter((r) => !r[hasManySchema.deleteField])
   }))
 }
 
