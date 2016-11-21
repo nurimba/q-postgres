@@ -8,7 +8,9 @@ const populateHasMany = async (tables, connection, schema, row, refs) => {
     const {table, field} = hasMany[hasManyField]
     const schemaHasMany = tables[table]
     const select = selectData.bind(this, connection, schemaHasMany)
-    const {rows} = await select('id').where({[field]: row.id}).run()
+    const filter = {[field]: row.id}
+    if (schemaHasMany.deleteField) filter[schemaHasMany.deleteField] = false
+    const {rows} = await select('id').where(filter).run()
     if (!rows || !rows.length) return
 
     row[hasManyField] = await Promise.all(rows.map(({id}) => findById(tables, connection, schemaHasMany, id, refs)))
@@ -23,7 +25,9 @@ const populateManyToMany = async (tables, connection, schema, row, refs) => {
     const schemaManyToMany = tables[table]
     const select = selectData.bind(this, connection, schemaManyToMany)
     const listExtraFields = Object.keys(extraFields)
-    const {rows} = await select(secondary, ...listExtraFields).where({[primary]: row.id}).run()
+    const filter = {[primary]: row.id}
+    if (schemaManyToMany.deleteField) filter[schemaManyToMany.deleteField] = false
+    const {rows} = await select(secondary, ...listExtraFields).where(filter).run()
     if (!rows || !rows.length) return
 
     row[manyToManyField] = await Promise.all(rows.map(async (rel) => {
