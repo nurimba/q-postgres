@@ -34,6 +34,7 @@ const condToStr = (conditions, values) => {
     if (field.toLowerCase() === '$or') return `(${condToStr(fieldVal, values).join(') OR (')})`
     if (field.toLowerCase() === '$and') return `(${condToStr(fieldVal, values).join(') AND (')})`
     const {comparator, value} = comWhere(fieldVal)
+    if (value === null && comparator === '=') return `${field} is null`
     values.push(value)
     return `${field} ${comparator} $${values.length}`
   })
