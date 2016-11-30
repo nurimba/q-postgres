@@ -48,9 +48,9 @@ const findById = async (tables, connection, schema, id, refs = {}) => {
   const {rows} = await select().where(filter).limit(1).run()
   if (!rows || !rows.length) return undefined
   const row = rows.map(objRow.bind(this, schema)).shift()
+  refs[ref] = row
   await populateHasMany(tables, connection, schema, row, refs)
   await populateManyToMany(tables, connection, schema, row, refs)
-  refs[ref] = {...row}
   return row
 }
 
