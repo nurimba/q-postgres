@@ -1,10 +1,10 @@
 import selectData from 'orm/select'
 import objRow from 'orm/objRow'
 
-const populateHasMany = async (tables, connection, schema, row, refs) => {
+const populateHasMany = (tables, connection, schema, row, refs) => {
   const {hasMany} = schema
 
-  await Promise.all(Object.keys(hasMany || {}).map(async (hasManyField) => {
+  return Promise.all(Object.keys(hasMany || {}).map(async (hasManyField) => {
     const {table, field} = hasMany[hasManyField]
     const schemaHasMany = tables[table]
     const select = selectData.bind(this, connection, schemaHasMany)
@@ -17,10 +17,10 @@ const populateHasMany = async (tables, connection, schema, row, refs) => {
   }))
 }
 
-const populateManyToMany = async (tables, connection, schema, row, refs) => {
+const populateManyToMany = (tables, connection, schema, row, refs) => {
   const {manyToMany} = schema
 
-  await Promise.all(Object.keys(manyToMany || {}).map(async (manyToManyField) => {
+  return Promise.all(Object.keys(manyToMany || {}).map(async (manyToManyField) => {
     const {table, primary, secondary, extraFields, schema} = manyToMany[manyToManyField]
     const schemaManyToMany = tables[table]
     const select = selectData.bind(this, connection, schemaManyToMany)
@@ -47,11 +47,10 @@ const findById = async (tables, connection, schema, id, refs = {}) => {
   if (schema.deleteField) filter[schema.deleteField] = false
   const {rows} = await select().where(filter).limit(1).run()
   if (!rows || !rows.length) return undefined
-
   const row = rows.map(objRow.bind(this, schema)).shift()
-  refs[ref] = row
   await populateHasMany(tables, connection, schema, row, refs)
   await populateManyToMany(tables, connection, schema, row, refs)
+  refs[ref] = {...row}
   return row
 }
 
