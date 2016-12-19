@@ -39,7 +39,7 @@ const populateManyToMany = (tables, connection, schema, row, refs) => {
   }))
 }
 
-const findById = async (tables, connection, schema, id, refs = {}) => {
+const findById = async (tables, connection, schema, id, refs = {}, autoPopulate = true) => {
   const ref = `${schema.table}-${id}`
   if (refs.hasOwnProperty(ref)) return {...refs[ref]}
   const select = selectData.bind(this, connection, schema)
@@ -49,12 +49,13 @@ const findById = async (tables, connection, schema, id, refs = {}) => {
   if (!rows || !rows.length) return undefined
   const row = rows.map(objRow.bind(this, schema)).shift()
   refs[ref] = row
+  if (!autoPopulate) return {...row}
   await populateHasMany(tables, connection, schema, row, refs)
   await populateManyToMany(tables, connection, schema, row, refs)
-  return row
+  return {...row}
 }
 
-const findBy = async (tables, connection, schema, attr, value, refs) => {
+const findBy = async (tables, connection, schema, attr, value, refs = {}, autoPopulate = true) => {
   const select = selectData.bind(this, connection, schema)
   let filter = {[attr]: value}
   if (schema.deleteField) filter[schema.deleteField] = false
@@ -62,7 +63,7 @@ const findBy = async (tables, connection, schema, attr, value, refs) => {
   if (!rows || !rows.length) return []
 
   if (!refs) refs = {}
-  const searchsById = rows.map(({id}) => findById(tables, connection, schema, id, refs))
+  const searchsById = rows.map(({id}) => findById(tables, connection, schema, id, refs, autoPopulate))
   return Promise.all(searchsById)
 }
 
