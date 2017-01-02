@@ -33,11 +33,27 @@ const condToStr = (conditions, values) => {
     const fieldVal = conditions[field]
     if (field.toLowerCase() === '$or') return `(${condToStr(fieldVal, values).join(') OR (')})`
     if (field.toLowerCase() === '$and') return `(${condToStr(fieldVal, values).join(') AND (')})`
-    const {comparator, value} = comWhere(fieldVal)
-    if (value === null && comparator === '=') return `${field} is null`
-    values.push(value)
-    return `${field} ${comparator} $${values.length}`
+
+    if (Array.isArray(fieldVal)) {
+      let condAr = []
+
+      fieldVal.forEach((val) => {
+        if (typeof val === 'object') return (condAr = condAr.concat(condToStr(val, values)))
+        condAr.push(toCond(field, val, values))
+      })
+
+      return `(${condAr.join(') OR (')})`
+    }
+
+    return toCond(field, fieldVal, values)
   })
+}
+
+const toCond = (fieldName, fieldValue, values) => {
+  const {comparator, value} = comWhere(fieldValue)
+  if (value === null && comparator === '=') return `${fieldName} is null`
+  values.push(value)
+  return `${fieldName} ${comparator} $${values.length}`
 }
 
 const where = (orm, conditions) => {

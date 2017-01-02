@@ -1,6 +1,6 @@
 {
   "name": "q-postgres",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "Postgres with promises.",
   "main": "dist/q-postgres.js",
   "repository": {
@@ -35,15 +35,15 @@
   "author": "Luiz Amorim <luiz.simples@gmail.com> (http://nurimba.com.br)",
   "license": "The Unilicense",
   "peerDependencies": {
-    "pg": "^6.1.1"
+    "pg": "^6.1.2"
   },
   "dependencies": {
-    "pg": "^6.1.1"
+    "pg": "^6.1.2"
   },
   "devDependencies": {
-    "babel-core": "^6.20.0",
+    "babel-core": "^6.21.0",
     "babel-eslint": "^7.1.1",
-    "babel-loader": "^6.2.9",
+    "babel-loader": "^6.2.10",
     "babel-plugin-istanbul": "^3.0.0",
     "babel-plugin-transform-runtime": "^6.15.0",
     "babel-polyfill": "^6.20.0",
@@ -52,7 +52,7 @@
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
     "cpf_cnpj": "^0.2.0",
-    "eslint": "^3.12.0",
+    "eslint": "^3.12.2",
     "eslint-config-standard": "^6.2.1",
     "eslint-plugin-babel": "^4.0.0",
     "eslint-plugin-promise": "^3.4.0",
@@ -64,7 +64,7 @@
     "mocha-webpack": "^0.7.0",
     "moment": "^2.17.1",
     "nyc": "^10.0.0",
-    "source-map-support": "^0.4.6",
+    "source-map-support": "^0.4.8",
     "webpack": "^1.14.0",
     "webpack-node-externals": "^1.5.4"
   },
