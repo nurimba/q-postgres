@@ -1,5 +1,4 @@
 import selectData from 'orm/select'
-import objRow from 'orm/objRow'
 
 const populateHasMany = (tables, connection, schema, row, refs) => {
   const {hasMany} = schema
@@ -47,7 +46,7 @@ const findById = async (tables, connection, schema, id, refs = {}, autoPopulate 
   if (schema.deleteField) filter[schema.deleteField] = false
   const {rows} = await select().where(filter).limit(1).run()
   if (!rows || !rows.length) return undefined
-  const row = rows.map(objRow.bind(this, schema)).shift()
+  const row = rows.shift()
   refs[ref] = row
   if (!autoPopulate) return {...row}
   await populateHasMany(tables, connection, schema, row, refs)
@@ -59,12 +58,15 @@ const findBy = async (tables, connection, schema, attr, value, refs = {}, autoPo
   const select = selectData.bind(this, connection, schema)
   let filter = {[attr]: value}
   if (schema.deleteField) filter[schema.deleteField] = false
-  const {rows} = await select('id').where(filter).run()
+  let {rows} = await select().where(filter).run()
   if (!rows || !rows.length) return []
+  if (!autoPopulate) return rows
 
-  if (!refs) refs = {}
-  const searchsById = rows.map(({id}) => findById(tables, connection, schema, id, refs, autoPopulate))
-  return Promise.all(searchsById)
+  return Promise.all(rows.map(async (row) => {
+    await populateHasMany(tables, connection, schema, row, refs)
+    await populateManyToMany(tables, connection, schema, row, refs)
+    return row
+  }))
 }
 
 const findByAttr = (tables, connection, schema) => {

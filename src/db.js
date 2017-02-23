@@ -12,14 +12,20 @@ const getConnection = async (pool) => {
 const runSql = (client, sql, parameters = []) => {
   return new Promise((resolve, reject) => {
     client.query(sql, parameters, (err, result) => {
-      if (client.config.debug) console.log('                          ')
-      if (client.config.debug) console.log('--------------------------')
-      if (client.config.debug && sql) console.log('\r\nSQL -> ', sql)
-      if (client.config.debug && parameters) console.log('\r\nPARAMS -> ', parameters)
-      if (client.config.debug && err) console.log('\r\nERROR -> ', err)
-      if (client.config.debug && result) console.log('\r\nRESULT -> ', result)
-      if (client.config.debug) console.log('--------------------------')
-      if (client.config.debug) console.log('                          ')
+      if (client.config.debug) {
+        console.log(`
+--------------------------
+SQL => ${sql}
+
+PARAMS => ${parameters.join(', ')}
+
+ERROR => ${err}
+
+RESULT => ${result}
+--------------------------
+        `)
+      }
+
       if (err) return reject(err)
       resolve(result)
     })

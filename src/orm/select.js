@@ -1,4 +1,5 @@
 import {selectTable} from 'gen'
+import objRow from 'orm/objRow'
 
 export default (connection, schema, ...fields) => {
   if (!fields || !fields.length) fields = Object.keys(schema.fields)
@@ -9,7 +10,9 @@ export default (connection, schema, ...fields) => {
   selectCommand.run = async () => {
     const whereConditions = selectCommand.values
     const selectSQL = selectCommand.toSQL()
-    return connection.execute(selectSQL, whereConditions)
+    const res = await connection.execute(selectSQL, whereConditions)
+    if (res.rows && res.rows.length) res.rows = res.rows.map(objRow.bind(this, schema))
+    return res
   }
 
   return selectCommand

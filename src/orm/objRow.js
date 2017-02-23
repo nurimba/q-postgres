@@ -19,15 +19,19 @@ export const formatInteger = (value) => {
 }
 
 export default (schema, row) => {
-  const data = {}
-
   Object.keys(schema.fields).forEach(field => {
-    let value = row[field.toLowerCase()]
+    const fieldLower = String(field || '').toLowerCase()
+    const isLower = Boolean(field !== fieldLower)
+    const fieldName = isLower ? fieldLower : field
+    if (!row.hasOwnProperty(fieldName)) return
+
+    let value = row[fieldName]
     if (schema.fields[field] === DATE) value = formatDate(value)
     if ([MONEY, PERCENT].indexOf(schema.fields[field]) > -1) value = formatFloat(value)
     if ([INTEGER, REFERENCES].indexOf(schema.fields[field]) > -1) value = formatInteger(value)
-    Object.assign(data, {[field]: value})
+    row[field] = value
+    if (isLower) delete row[fieldName]
   })
 
-  return data
+  return row
 }
