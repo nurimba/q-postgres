@@ -63,6 +63,19 @@ const where = (orm, conditions) => {
   return orm
 }
 
+const value = (orm, value) => {
+  if (!orm.values) orm.values = []
+  orm.values.push(value)
+  return orm
+}
+
+const setValues = (orm, values) => {
+  if (!values) values = []
+  if (!orm.values) orm.values = []
+  orm.values = values
+  return orm
+}
+
 const toSQL = ({tableName, fields, order, group, conditions, limitRows, skipRows, joins}) => {
   const skip = skipRows ? `${breakline}OFFSET ${skipRows}` : ''
   const limit = limitRows ? `${breakline}LIMIT ${limitRows}` : ''
@@ -86,7 +99,9 @@ export default () => {
   orm.field = field.bind(this, orm)
   orm.toSQL = toSQL.bind(this, orm)
   orm.where = where.bind(this, orm)
+  orm.value = value.bind(this, orm)
   orm.orderBy = orderBy.bind(this, orm)
   orm.groupBy = groupBy.bind(this, orm)
+  orm.setValues = setValues.bind(this, orm)
   return orm
 }
