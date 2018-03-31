@@ -67,9 +67,5 @@
     "source-map-support": "^0.4.11",
     "webpack": "^1.14.0",
     "webpack-node-externals": "^1.5.4"
-  },
-  "engines": {
-    "node": "^7.x.x",
-    "npm": "^3.x.x"
   }
 }
