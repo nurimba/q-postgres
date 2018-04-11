@@ -1,6 +1,7 @@
 export const TEXT = 'TEXT'
 export const NAME = 'VARCHAR(255)'
 export const DATE = 'DATE'
+export const JSON = 'JSON'
 export const ARRAY = 'JSONB'
 export const CHAR1 = 'CHAR(1)'
 export const CHAR2 = 'CHAR(2)'
@@ -52,6 +53,7 @@ export default {
   TEXT,
   DATE,
   NAME,
+  JSON,
   ARRAY,
   CHAR1,
   CHAR2,

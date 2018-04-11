@@ -23,8 +23,7 @@ const objValues = (orm, values) => {
   orm.listFields.forEach((field) => {
     const asArray = isArray(fields[field])
     const value = values[field]
-    if (asArray) return orm.paramters.push(JSON.stringify([value]).concat('::JSONB'))
-
+    if (asArray) return orm.paramters.push(`'${JSON.stringify([value])}'::JSONB`)
     orm.values.push(value)
     orm.paramters.push(`$${orm.values.length}`)
   })
