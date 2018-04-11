@@ -3,6 +3,7 @@ export const CITEXT = 'CITEXT'
 export const NAME = 'VARCHAR(255)'
 export const DATE = 'DATE'
 export const JSON = 'JSON'
+export const JSONB = 'JSONB'
 export const CHAR1 = 'CHAR(1)'
 export const CHAR2 = 'CHAR(2)'
 export const CHAR8 = 'CHAR(8)'
@@ -32,6 +33,7 @@ export default {
   EMAIL,
   PHONE,
   MONEY,
+  JSONB,
   STRING,
   SELECT,
   CITEXT,

@@ -4,7 +4,6 @@ const nodeExternals = require('webpack-node-externals')
 
 module.exports = {
   devtool: 'cheap-module-source-map',
-  debug: false,
 
   target: 'node', // in order to ignore built-in modules like path, fs, etc.
   externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
@@ -20,24 +19,15 @@ module.exports = {
   },
 
   resolve: {
-    modulesDirectories: [
+    modules: [
       path.resolve('./src'),
-      path.resolve('./node_modules')
+      'node_modules'
     ]
   },
 
   module: {
-    loaders: [
+    rules: [
       { test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader' }
     ]
-  },
-
-  plugins: [
-    new webpack.optimize.OccurrenceOrderPlugin(),
-    new webpack.optimize.DedupePlugin(),
-    new webpack.optimize.UglifyJsPlugin({
-      compress: { warnings: false },
-      output: { comments: false }
-    })
-  ]
+  }
 }
