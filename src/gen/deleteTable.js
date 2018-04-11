@@ -1,3 +1,4 @@
+import {prepareReturning} from './utils'
 import comWhere from 'gen/comparatorWhere'
 const breakline = `
 `
@@ -5,13 +6,14 @@ const breakline = `
 const toSQL = (orm) => {
   const {schema, conditions} = orm
   const {table, fields} = schema
+  const returning = prepareReturning(fields)
   const sqlWhere = conditions && conditions.length
     ? `${breakline}WHERE (${conditions.join(`)${breakline}  AND (`)})`
     : ''
 
   return `
 DELETE FROM ${table}${sqlWhere}
-RETURNING ${Object.keys(fields).join(', ')};
+RETURNING ${returning};
 `.trim()
 }
 
