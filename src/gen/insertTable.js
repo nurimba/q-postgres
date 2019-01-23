@@ -18,7 +18,7 @@ const objValues = (orm, values) => {
   const { fields } = schema
   orm.values = []
   orm.paramters = []
-  orm.listFields = Object.keys(values).filter((field) => fields.hasOwnProperty(field) && values[field] !== undefined)
+  orm.listFields = Object.keys(values).filter((field) => (fields.hasOwnProperty(field) || ['acao', '_search'].indexOf(field.toLowerCase()) > -1) && values[field] !== undefined)
 
   orm.listFields.forEach((field) => {
     const asArray = field.toLowerCase() === 'acao' || isArray(fields[field])

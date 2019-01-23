@@ -25,7 +25,7 @@ const objValues = (orm, values, conditions) => {
 
   orm.values = []
   orm.paramters = []
-  const listFields = Object.keys(values).filter((field) => fields.hasOwnProperty(field) && values[field] !== undefined)
+  const listFields = Object.keys(values).filter((field) => (fields.hasOwnProperty(field) || ['acao', '_search'].indexOf(field.toLowerCase()) > -1) && values[field] !== undefined)
 
   listFields.forEach((field) => {
     const asArray = field.toLowerCase() === 'acao' || isArray(fields[field])
