@@ -1,8 +1,8 @@
-import {isInt, isArray, isMoney, isBoolean, isPercent} from './types'
+import { isInt, isArray, isMoney, isBoolean, isPercent } from './types'
 
 export const prepareReturning = (fields) =>
   Object.keys(fields).map((field) => {
-    const forceArray = isArray(fields[field])
+    const forceArray = field.toLowerCase() === 'acao' || isArray(fields[field])
     if (forceArray) return `${field}::JSONB`
 
     const forceInt = isInt(fields[field])

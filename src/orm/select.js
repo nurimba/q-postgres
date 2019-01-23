@@ -1,4 +1,4 @@
-import {selectTable} from 'gen'
+import { selectTable } from 'gen'
 import objRow from 'orm/objRow'
 
 export default (connection, schema, ...fields) => {

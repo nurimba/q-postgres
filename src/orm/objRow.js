@@ -1,4 +1,4 @@
-import {DATE, MONEY, PERCENT, INTEGER, REFERENCES} from 'gen/types'
+import { DATE, MONEY, PERCENT, INTEGER, REFERENCES } from 'gen/types'
 
 export const formatDate = (value) => {
   if (!value || !String(value).trim()) return null

@@ -6,7 +6,9 @@
     "globals": {
       "jest": false,
       "test": false,
+      "after": false,
       "expect": false,
+      "before": false,
       "describe": false,
       "afterAll": false,
       "beforeAll": false,

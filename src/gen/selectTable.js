@@ -24,9 +24,9 @@ const join = (orm, joinString) => {
   return orm
 }
 
-const fromTable = (orm, tableName) => Object.assign(orm, {tableName})
-const limit = (orm, limitRows) => Object.assign(orm, {limitRows})
-const skip = (orm, skipRows) => Object.assign(orm, {skipRows})
+const fromTable = (orm, tableName) => Object.assign(orm, { tableName })
+const limit = (orm, limitRows) => Object.assign(orm, { limitRows })
+const skip = (orm, skipRows) => Object.assign(orm, { skipRows })
 
 const condToStr = (conditions, values) => {
   return Object.keys(conditions).map((field) => {
@@ -50,7 +50,7 @@ const condToStr = (conditions, values) => {
 }
 
 const toCond = (fieldName, fieldValue, values) => {
-  const {comparator, value} = comWhere(fieldValue)
+  const { comparator, value } = comWhere(fieldValue)
   if (value === null && comparator === '=') return `${fieldName} is null`
   values.push(value)
   return `${fieldName} ${comparator} $${values.length}`
@@ -76,7 +76,7 @@ const setValues = (orm, values) => {
   return orm
 }
 
-const toSQL = ({tableName, fields, order, group, conditions, limitRows, skipRows, joins}) => {
+const toSQL = ({ tableName, fields, order, group, conditions, limitRows, skipRows, joins }) => {
   const skip = skipRows ? `${breakline}OFFSET ${skipRows}` : ''
   const limit = limitRows ? `${breakline}LIMIT ${limitRows}` : ''
   const orderBy = order && order.length ? `${breakline}ORDER BY ${order.join(', ')}` : ''
@@ -91,7 +91,7 @@ FROM ${tableName}${allJoins}${sqlWhere}${groupBy}${orderBy}${limit}${skip}
 }
 
 export default () => {
-  const orm = {tableName: '', fields: [], order: [], group: [], values: [], joins: []}
+  const orm = { tableName: '', fields: [], order: [], group: [], values: [], joins: [] }
   orm.from = fromTable.bind(this, orm)
   orm.join = join.bind(this, orm)
   orm.skip = skip.bind(this, orm)

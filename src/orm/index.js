@@ -1,7 +1,7 @@
 import selectData from 'orm/select'
 import deleteData from 'orm/delete'
 import findByAttr from 'orm/findByAttr'
-import {insertData, updateData} from 'orm/insUpd'
+import { insertData, updateData } from 'orm/insUpd'
 
 const ormModel = (tables, connection, modelName) => {
   const schema = JSON.parse(JSON.stringify(tables[modelName]))
@@ -11,7 +11,7 @@ const ormModel = (tables, connection, modelName) => {
 
   const orm = ormModel.bind(this, tables, connection)
 
-  const model = {schema}
+  const model = { schema }
   model.select = selectData.bind(this, connection, schema)
   model.delete = deleteData.bind(this, connection, schema)
   model.insert = insertData.bind(this, orm, tables, connection, schema)
@@ -23,6 +23,6 @@ const ormDatabase = (tables, connection) => ormModel.bind(this, tables, connecti
 
 export default (schemas) => {
   const tables = {}
-  schemas.forEach((schema) => Object.assign(tables, {[schema.table]: schema}))
+  schemas.forEach((schema) => Object.assign(tables, { [schema.table]: schema }))
   return ormDatabase.bind(this, tables)
 }
